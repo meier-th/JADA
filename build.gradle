@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+group 'org.meier'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.20.2'
+}
