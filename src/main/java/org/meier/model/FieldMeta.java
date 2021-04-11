@@ -1,17 +1,18 @@
 package org.meier.model;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class FieldMeta implements Meta {
 
     private final String name;
-    private final Class<?> type;
+    private final String fullClassName;
     private final Set<Modifier> modifiers;
     private ClassWrapper ownerClass;
 
-    public FieldMeta(String name, Class<?> type, Set<Modifier> modifiers) {
+    public FieldMeta(String name, String fullClassName, Set<Modifier> modifiers) {
         this.name = name;
-        this.type = type;
+        this.fullClassName = fullClassName;
         this.modifiers = modifiers;
     }
 
@@ -27,8 +28,8 @@ public class FieldMeta implements Meta {
         return name;
     }
 
-    public Class<?> getType() {
-        return type;
+    public String getFullClassName() {
+        return fullClassName;
     }
 
     public Set<Modifier> getModifiers() {
@@ -55,5 +56,12 @@ public class FieldMeta implements Meta {
     @Override
     public boolean isSynchronised() {
         return modifiers.contains(Modifier.SYNCHRONISED);
+    }
+
+    @Override
+    public String toString() {
+        return "name: " + name + "\n" +
+                "type: " + fullClassName + "\n" +
+                "modifiers: " + modifiers.stream().map(Modifier::toString).collect(Collectors.joining());
     }
 }
