@@ -8,7 +8,7 @@ public class FieldMeta implements Meta {
     private final String name;
     private final String fullClassName;
     private final Set<Modifier> modifiers;
-    private ClassWrapper ownerClass;
+    private ClassMeta ownerClass;
 
     public FieldMeta(String name, String fullClassName, Set<Modifier> modifiers) {
         this.name = name;
@@ -16,7 +16,7 @@ public class FieldMeta implements Meta {
         this.modifiers = modifiers;
     }
 
-    public void setOwnerClass(ClassWrapper owner) {
+    public void setOwnerClass(ClassMeta owner) {
         this.ownerClass = owner;
     }
 
@@ -36,7 +36,7 @@ public class FieldMeta implements Meta {
         return modifiers;
     }
 
-    public ClassWrapper getOwnerClass() {
+    public ClassMeta getOwnerClass() {
         return ownerClass;
     }
 

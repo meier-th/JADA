@@ -12,7 +12,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
-import org.meier.model.ClassWrapper;
+import org.meier.model.ClassMeta;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,15 +44,15 @@ public class FSProjectLoader implements ProjectLoader {
     }
 
     @Override
-    public ClassWrapper loadFile(String filePath, String jarsDir) throws IOException {
+    public ClassMeta loadFile(String filePath, String jarsDir) throws IOException {
             init(Paths.get(filePath), Paths.get(jarsDir));
             CompilationUnit headNode = StaticJavaParser.parse(Paths.get(filePath));
-            return new ClassWrapper(headNode);
+            return new ClassMeta(headNode);
     }
 
 
     @Override
-    public List<ClassWrapper> loadProject(String dirPath, String jarsDir) throws IOException {
+    public List<ClassMeta> loadProject(String dirPath, String jarsDir) throws IOException {
         Path path = Paths.get(dirPath);
 
         ProjectRoot projectRoot =
@@ -69,7 +69,7 @@ public class FSProjectLoader implements ProjectLoader {
             }
         }).map(pr -> pr.getResult().orElse(null))
                 .filter(Objects::nonNull)
-                .map(ClassWrapper::new)
+                .map(ClassMeta::new)
                 .collect(Collectors.toList());
     }
 

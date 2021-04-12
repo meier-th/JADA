@@ -1,27 +1,40 @@
 package org.meier.model;
 
+import org.meier.bean.NameTypeBean;
+
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MethodMeta implements Meta {
 
     private final String name;
+    private final String fullQualifiedReturnType;
     private final Set<Modifier> modifiers;
-    private final List<Class<?>> parameterTypes;
+    private final List<NameTypeBean> parameters;
     private final List<FieldMeta> accessedFields;
-    private final List<MethodMeta> calledMethods;
-    private ClassWrapper ownerClass;
+    private final List<String> calledMethods;
+    private ClassMeta ownerClass;
 
-    public MethodMeta(String name, Set<Modifier> modifiers, List<Class<?>> parameterTypes, List<FieldMeta> accessedFields, List<MethodMeta> calledMethods) {
+    public MethodMeta(String name, Set<Modifier> modifiers, List<NameTypeBean> parameters, List<FieldMeta> accessedFields, List<String> calledMethods, String fullQualifiedReturnType) {
         this.name = name;
         this.modifiers = modifiers;
-        this.parameterTypes = parameterTypes;
+        this.parameters = parameters;
         this.accessedFields = accessedFields;
         this.calledMethods = calledMethods;
+        this.fullQualifiedReturnType = fullQualifiedReturnType;
     }
 
-    public void setOwnerClass(ClassWrapper cls) {
+    public void setOwnerClass(ClassMeta cls) {
         this.ownerClass = cls;
+    }
+
+    public String getUniqueName() {
+        return name+"("+buildParamsString()+")";
+    }
+
+    private String buildParamsString() {
+        return this.parameters.stream().map(NameTypeBean::getFullClassName).collect(Collectors.joining(", "));
     }
 
     public String getName() {
@@ -32,19 +45,23 @@ public class MethodMeta implements Meta {
         return modifiers;
     }
 
-    public List<Class<?>> getParameterTypes() {
-        return parameterTypes;
+    public String getFullQualifiedReturnType() {
+        return fullQualifiedReturnType;
+    }
+
+    public List<NameTypeBean> getParameters() {
+        return parameters;
     }
 
     public List<FieldMeta> getAccessedFields() {
         return accessedFields;
     }
 
-    public List<MethodMeta> getCalledMethods() {
+    public List<String> getCalledMethods() {
         return calledMethods;
     }
 
-    public ClassWrapper getOwnerClass() {
+    public ClassMeta getOwnerClass() {
         return ownerClass;
     }
 
