@@ -4,6 +4,7 @@ import org.meier.check.visitor.FieldVisitor;
 import org.meier.check.visitor.MethodVisitor;
 import org.meier.loader.FSProjectLoader;
 import org.meier.model.ClassMeta;
+import org.meier.model.MetaHolder;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,6 +17,7 @@ public class Main {
             List<ClassMeta> classes = loader.loadProject("/home/thom/IdeaProjects/communicator/src/main/java",
                     "/home/thom/.gradle/caches/modules-2/files-2.1");
             classes.forEach(classMeta -> {
+                MetaHolder.addClass(classMeta);
                 classMeta.getClassNode().accept(new FieldVisitor(), classMeta);
                 classMeta.getClassNode().accept(new MethodVisitor(), classMeta);
             });

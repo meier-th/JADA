@@ -47,7 +47,7 @@ public class FSProjectLoader implements ProjectLoader {
     public ClassMeta loadFile(String filePath, String jarsDir) throws IOException {
             init(Paths.get(filePath), Paths.get(jarsDir));
             CompilationUnit headNode = StaticJavaParser.parse(Paths.get(filePath));
-            return new ClassMeta(headNode);
+            return new ClassMeta(headNode, "");
     }
 
 
@@ -69,7 +69,7 @@ public class FSProjectLoader implements ProjectLoader {
             }
         }).map(pr -> pr.getResult().orElse(null))
                 .filter(Objects::nonNull)
-                .map(ClassMeta::new)
+                .map(cu -> new ClassMeta(cu, ""))
                 .collect(Collectors.toList());
     }
 
