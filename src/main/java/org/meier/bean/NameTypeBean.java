@@ -17,4 +17,8 @@ public class NameTypeBean {
     public String getFullClassName() {
         return fullClassName;
     }
+
+    public String getFullName() {
+        return fullClassName + " " + name;
+    }
 }

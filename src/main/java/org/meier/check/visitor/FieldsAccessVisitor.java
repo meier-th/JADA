@@ -8,21 +8,26 @@ import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
 import org.meier.model.MetaHolder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FieldsAccessVisitor extends GenericListVisitorAdapter<FieldMeta, ClassMeta> {
+public class FieldsAccessVisitor extends GenericListVisitorAdapter<FieldMeta, Void> {
 
     @Override
-    public List<FieldMeta> visit(FieldAccessExpr n, ClassMeta classMeta) {
-        String ownerClass = "";
-        Expression scope = n.getScope();
+    public List<FieldMeta> visit(FieldAccessExpr n, Void arg) {
         try {
-            ownerClass = scope.calculateResolvedType().describe();
+            Expression scope = n.getScope();
+            String ownerClass = scope.calculateResolvedType().describe();
+            String fieldName = n.resolve().isEnumConstant() ? n.resolve().asEnumConstant().toString() : n.resolve().asField().getName();
+            ClassMeta owner =  MetaHolder.getClass(ownerClass);
+            if (owner != null) {
+                return owner.getFields().stream().filter(field -> field.getName().equals(fieldName)).collect(Collectors.toList());
+            }
+            return Collections.emptyList();
         } catch (UnsolvedSymbolException error) {
             // some logs
+            return Collections.emptyList();
         }
-        String fieldName = n.resolve().isEnumConstant() ? n.resolve().asEnumConstant().toString() : n.resolve().asField().getName();
-        return MetaHolder.getClass(ownerClass).getFields().stream().filter(field -> field.getName().equals(fieldName)).collect(Collectors.toList());
     }
 }

@@ -23,7 +23,7 @@ public class FieldVisitor extends VoidVisitorAdapter<ClassMeta> {
             fieldDecl.accept(new ModifierVisitor(), modifiersList);
             Set<Modifier> modifiers = Set.copyOf(modifiersList);
             classMeta.getFields().addAll(names.stream()
-                    .map(nameTypeBean -> new FieldMeta(nameTypeBean.getName(), nameTypeBean.getFullClassName(), modifiers))
+                    .map(nameTypeBean -> new FieldMeta(nameTypeBean.getName(), nameTypeBean.getFullClassName(), modifiers, classMeta))
                     .collect(Collectors.toList()));
         } catch (Exception error) {
             // some log

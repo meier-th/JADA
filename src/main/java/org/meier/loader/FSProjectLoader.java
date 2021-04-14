@@ -12,6 +12,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
+import org.meier.check.visitor.ClassNameVisitor;
 import org.meier.model.ClassMeta;
 
 import java.io.IOException;
@@ -69,7 +70,7 @@ public class FSProjectLoader implements ProjectLoader {
             }
         }).map(pr -> pr.getResult().orElse(null))
                 .filter(Objects::nonNull)
-                .map(cu -> new ClassMeta(cu, ""))
+                .map(cu -> new ClassMeta(cu, cu.accept(new ClassNameVisitor(), null).get(0)))
                 .collect(Collectors.toList());
     }
 

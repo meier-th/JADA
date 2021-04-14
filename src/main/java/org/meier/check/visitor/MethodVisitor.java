@@ -3,6 +3,7 @@ package org.meier.check.visitor;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
 import org.meier.check.util.TypeResolver;
 import org.meier.model.ClassMeta;
@@ -31,10 +32,11 @@ public class MethodVisitor extends VoidVisitorAdapter<ClassMeta> {
                 new NameTypeBean(param.getNameAsString(), TypeResolver.getQualifiedName(param.getType()))
         ).collect(Collectors.toList());
 
-        List<FieldMeta> accessedFields = n.accept(new FieldsAccessVisitor(), classMeta);
+        List<FieldMeta> accessedFields = n.accept(new FieldsAccessVisitor(), null);
 
-        // methods
-        MethodMeta method = new MethodMeta(fullName, Set.copyOf(modifiersList), parameters, accessedFields, List.of(), returnType);
-        classMeta.getMethods().add(method);
+        List<CalledMethodBean> calledMethods = n.accept(new MethodCallVisitor(), null);
+
+        MethodMeta method = new MethodMeta(fullName, Set.copyOf(modifiersList), parameters, accessedFields, calledMethods, returnType, classMeta);
+        classMeta.addMethod(method);
     }
 }

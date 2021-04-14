@@ -10,10 +10,11 @@ public class FieldMeta implements Meta {
     private final Set<Modifier> modifiers;
     private ClassMeta ownerClass;
 
-    public FieldMeta(String name, String fullClassName, Set<Modifier> modifiers) {
+    public FieldMeta(String name, String fullClassName, Set<Modifier> modifiers, ClassMeta ownerClass) {
         this.name = name;
         this.fullClassName = fullClassName;
         this.modifiers = modifiers;
+        this.ownerClass = ownerClass;
     }
 
     public void setOwnerClass(ClassMeta owner) {
@@ -60,8 +61,6 @@ public class FieldMeta implements Meta {
 
     @Override
     public String toString() {
-        return "name: " + name + "\n" +
-                "type: " + fullClassName + "\n" +
-                "modifiers: " + modifiers.stream().map(Modifier::toString).collect(Collectors.joining());
+        return modifiers.stream().map(Modifier::toString).collect(Collectors.joining(" ")) + " " + fullClassName + "." + name;
     }
 }

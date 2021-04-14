@@ -1,8 +1,11 @@
 package org.meier.model;
 
+import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,16 +16,34 @@ public class MethodMeta implements Meta {
     private final Set<Modifier> modifiers;
     private final List<NameTypeBean> parameters;
     private final List<FieldMeta> accessedFields;
-    private final List<String> calledMethods;
+    private List<MethodMeta> calledMethods;
+    private final List<CalledMethodBean> calledMethodsNames;
     private ClassMeta ownerClass;
 
-    public MethodMeta(String name, Set<Modifier> modifiers, List<NameTypeBean> parameters, List<FieldMeta> accessedFields, List<String> calledMethods, String fullQualifiedReturnType) {
+    public MethodMeta(String name, Set<Modifier> modifiers, List<NameTypeBean> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass) {
         this.name = name;
         this.modifiers = modifiers;
         this.parameters = parameters;
         this.accessedFields = accessedFields;
-        this.calledMethods = calledMethods;
+        this.calledMethodsNames = calledMethods;
         this.fullQualifiedReturnType = fullQualifiedReturnType;
+        this.ownerClass = ownerClass;
+    }
+
+    public void resolveCalledMethods() {
+        calledMethods = calledMethodsNames.stream()
+                .map(meth -> {
+                    ClassMeta ownerClass = MetaHolder.getClass(meth.getClassName());
+                    if (ownerClass != null) {
+                        return ownerClass.getMethods()
+                                .stream()
+                                .filter(mt -> mt.getName().equals(meth.getFullMethodName()))
+                                .findFirst().orElse(null);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public void setOwnerClass(ClassMeta cls) {
@@ -35,6 +56,10 @@ public class MethodMeta implements Meta {
 
     private String buildParamsString() {
         return this.parameters.stream().map(NameTypeBean::getFullClassName).collect(Collectors.joining(", "));
+    }
+
+    public void addCalledMethod(MethodMeta callee) {
+        calledMethods.add(callee);
     }
 
     public String getName() {
@@ -57,7 +82,7 @@ public class MethodMeta implements Meta {
         return accessedFields;
     }
 
-    public List<String> getCalledMethods() {
+    public List<MethodMeta> getCalledMethods() {
         return calledMethods;
     }
 
@@ -81,5 +106,11 @@ public class MethodMeta implements Meta {
     @Override
     public boolean isSynchronised() {
         return modifiers.contains(Modifier.SYNCHRONISED);
+    }
+
+    @Override
+    public String toString() {
+        return modifiers.stream().map(Modifier::toString).collect(Collectors.joining(" "))+" "+fullQualifiedReturnType+" "+name+
+                "(" + buildParamsString() + ")";
     }
 }

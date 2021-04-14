@@ -28,12 +28,12 @@ public class TypeResolver {
         if (type.isWildcard())
             return type.asWildcard().describe();
         if (type.isPrimitive())
-            return type.asPrimitive().toString();
+            return type.asPrimitive().describe();
         if (type.isReference())
             return type.asReferenceType().getQualifiedName();
         if (type.isVoid())
             return "void";
-        return type.toString();
+        return type.describe();
     }
 
     private static String getGenericType(Type type) {

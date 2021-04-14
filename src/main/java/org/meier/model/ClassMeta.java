@@ -22,6 +22,14 @@ public class ClassMeta {
         return fullName;
     }
 
+    public void addMethod(MethodMeta method) {
+        methods.add(method);
+    }
+
+    public void addField(FieldMeta field) {
+        fields.add(field);
+    }
+
     public CompilationUnit getClassNode() {
         return classNode;
     }
