@@ -7,14 +7,13 @@ import java.util.List;
 
 public class ClassMeta {
 
-    private final CompilationUnit classNode;
+    private final CompilationUnit classNode = null;
     private final String fullName;
     private List<MethodMeta> methods = new ArrayList<>();
     private List<FieldMeta> fields = new ArrayList<>();
     private List<ClassMeta> innerClasses = new ArrayList<>();
 
-    public ClassMeta(CompilationUnit classNode, String fullName) {
-        this.classNode = classNode;
+    public ClassMeta(String fullName) {
         this.fullName = fullName;
     }
 

@@ -1,14 +1,16 @@
 package org.meier.check.visitor;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.visitor.GenericListVisitorAdapter;
+import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
-import java.util.List;
-
-public class ClassNameVisitor extends GenericListVisitorAdapter<String, Void> {
+public class ClassNameVisitor extends GenericVisitorAdapter<String, Void> {
 
     @Override
-    public List<String> visit(ClassOrInterfaceDeclaration n, Void arg) {
-        return List.of(n.resolve().asReferenceType().getQualifiedName());
+    public String visit(ClassOrInterfaceDeclaration n, Void arg) {
+        try {
+            return n.resolve().asReferenceType().getQualifiedName();
+        } catch (Exception error) {
+            return "";
+        }
     }
 }

@@ -13,7 +13,11 @@ import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
 import org.meier.check.visitor.ClassNameVisitor;
+import org.meier.check.visitor.FieldVisitor;
+import org.meier.check.visitor.InnerClassVisitor;
+import org.meier.check.visitor.MethodVisitor;
 import org.meier.model.ClassMeta;
+import org.meier.model.MethodMeta;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,8 +32,8 @@ public class FSProjectLoader implements ProjectLoader {
 
     private ParserConfiguration init(Path projectPath, Path jarDir) throws IOException {
         TypeSolver reflectionTypeSolver = new ReflectionTypeSolver();
-        TypeSolver javaParserTypeSolver = new JavaParserTypeSolver(projectPath);
         CombinedTypeSolver combinedSolver = new CombinedTypeSolver();
+        JavaParserTypeSolver javaParserTypeSolver = new JavaParserTypeSolver(projectPath);
         combinedSolver.add(reflectionTypeSolver);
         combinedSolver.add(javaParserTypeSolver);
         Files.walk(jarDir, Integer.MAX_VALUE).filter(this::isJar).forEach(jar -> {
@@ -45,10 +49,10 @@ public class FSProjectLoader implements ProjectLoader {
     }
 
     @Override
-    public ClassMeta loadFile(String filePath, String jarsDir) throws IOException {
-            init(Paths.get(filePath), Paths.get(jarsDir));
+    public ClassMeta loadFile(String filePath, String projectPath, String jarsDir) throws IOException {
+            init(Paths.get(projectPath), Paths.get(jarsDir));
             CompilationUnit headNode = StaticJavaParser.parse(Paths.get(filePath));
-            return new ClassMeta(headNode, "");
+            return new ClassMeta(headNode.accept(new ClassNameVisitor(), null));
     }
 
 
@@ -70,29 +74,16 @@ public class FSProjectLoader implements ProjectLoader {
             }
         }).map(pr -> pr.getResult().orElse(null))
                 .filter(Objects::nonNull)
-                .map(cu -> new ClassMeta(cu, cu.accept(new ClassNameVisitor(), null).get(0)))
+                .map(cu ->  {
+                    String clsName = cu.accept(new ClassNameVisitor(), null);
+                    ClassMeta cls = new ClassMeta(clsName);
+                    cu.accept(new FieldVisitor(), cls);
+                    cu.accept(new MethodVisitor(), cls);
+                    cu.accept(new InnerClassVisitor(), cls);
+                    cls.getMethods().forEach(MethodMeta::resolveCalledMethods);
+                    return cls;
+                })
                 .collect(Collectors.toList());
-    }
-
-/*
-    @Override
-    public List<ClassWrapper> loadProject(String dirPath, String jarPath) throws IOException {
-        Path srcPath = Paths.get(dirPath);
-        Path libPath = Paths.get(jarPath);
-        init(srcPath, libPath);
-        if (!Files.isDirectory(srcPath))
-            return List.of(loadFile(dirPath, jarPath));
-        return Files.walk(srcPath, Integer.MAX_VALUE).filter(this::isJavaFile)
-                .map(file -> {
-                    try {
-                        return new ClassWrapper(StaticJavaParser.parse(file));
-                    } catch (IOException error){
-                        return null;}
-                }).collect(Collectors.toList());
-    }
-*/
-    private boolean isJavaFile(Path file) {
-        return Files.isRegularFile(file) && file.toString().endsWith(".java");
     }
 
     private boolean isJar(Path file) {
