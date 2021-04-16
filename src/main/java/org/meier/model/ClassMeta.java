@@ -1,20 +1,42 @@
 package org.meier.model;
 
-import com.github.javaparser.ast.CompilationUnit;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassMeta {
+public class ClassMeta implements Meta {
 
-    private final CompilationUnit classNode = null;
     private final String fullName;
     private List<MethodMeta> methods = new ArrayList<>();
     private List<FieldMeta> fields = new ArrayList<>();
-    private List<ClassMeta> innerClasses = new ArrayList<>();
+    private final List<ClassMeta> innerClasses = new ArrayList<>();
+    private final List<Modifier> modifiers = new ArrayList<>();
 
-    public ClassMeta(String fullName) {
+    public ClassMeta(String fullName, List<Modifier> modifiers) {
         this.fullName = fullName;
+        this.modifiers.addAll(modifiers);
+    }
+
+    public void resolveMethodCalls() {
+        this.methods.forEach(MethodMeta::resolveCalledMethods);
+        this.getInnerClasses().forEach(ClassMeta::resolveMethodCalls);
+    }
+
+    @Override
+    public boolean isStatic() {
+        return this.modifiers.contains(Modifier.STATIC);
+    }
+
+    @Override
+    public Modifier accessModifier() {
+        return modifiers.contains(Modifier.PUBLIC) ? Modifier.PUBLIC :
+                modifiers.contains(Modifier.PROTECTED) ? Modifier.PROTECTED :
+                        modifiers.contains(Modifier.PRIVATE) ? Modifier.PRIVATE :
+                                Modifier.DEFAULT_ACCESS;
+    }
+
+    @Override
+    public boolean isSynchronised() {
+        return false;
     }
 
     public String getFullName() {
@@ -27,10 +49,6 @@ public class ClassMeta {
 
     public void addField(FieldMeta field) {
         fields.add(field);
-    }
-
-    public CompilationUnit getClassNode() {
-        return classNode;
     }
 
     public List<MethodMeta> getMethods() {

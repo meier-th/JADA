@@ -12,17 +12,16 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
-import org.meier.check.visitor.ClassNameVisitor;
-import org.meier.check.visitor.FieldVisitor;
-import org.meier.check.visitor.InnerClassVisitor;
-import org.meier.check.visitor.MethodVisitor;
+import org.meier.check.visitor.*;
 import org.meier.model.ClassMeta;
 import org.meier.model.MethodMeta;
+import org.meier.model.Modifier;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -52,7 +51,9 @@ public class FSProjectLoader implements ProjectLoader {
     public ClassMeta loadFile(String filePath, String projectPath, String jarsDir) throws IOException {
             init(Paths.get(projectPath), Paths.get(jarsDir));
             CompilationUnit headNode = StaticJavaParser.parse(Paths.get(filePath));
-            return new ClassMeta(headNode.accept(new ClassNameVisitor(), null));
+            List<Modifier> modifiersList = new ArrayList<>();
+            headNode.accept(new ModifierVisitor(), modifiersList);
+            return new ClassMeta(headNode.accept(new ClassNameVisitor(), null), modifiersList);
     }
 
 
@@ -76,7 +77,9 @@ public class FSProjectLoader implements ProjectLoader {
                 .filter(Objects::nonNull)
                 .map(cu ->  {
                     String clsName = cu.accept(new ClassNameVisitor(), null);
-                    ClassMeta cls = new ClassMeta(clsName);
+                    List<Modifier> modifiersList = new ArrayList<>();
+                    cu.accept(new ModifierVisitor(), modifiersList);
+                    ClassMeta cls = new ClassMeta(clsName, modifiersList);
                     cu.accept(new FieldVisitor(), cls);
                     cu.accept(new MethodVisitor(), cls);
                     cu.accept(new InnerClassVisitor(), cls);
