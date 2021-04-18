@@ -14,16 +14,14 @@ import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
 import org.meier.check.visitor.*;
 import org.meier.model.ClassMeta;
-import org.meier.model.MethodMeta;
+import org.meier.model.MetaHolder;
 import org.meier.model.Modifier;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,7 +56,7 @@ public class FSProjectLoader implements ProjectLoader {
 
 
     @Override
-    public List<ClassMeta> loadProject(String dirPath, String jarsDir) throws IOException {
+    public void loadProject(String dirPath, String jarsDir) throws IOException {
         Path path = Paths.get(dirPath);
 
         ProjectRoot projectRoot =
@@ -66,7 +64,8 @@ public class FSProjectLoader implements ProjectLoader {
                         .collect(path);
 
         List<SourceRoot> roots = projectRoot.getSourceRoots();
-        return roots.stream().flatMap(root -> {
+
+        List<CompilationUnit> cus = roots.stream().flatMap(root -> {
             try {
                 return root.tryToParse().stream();
             } catch (IOException e) {
@@ -75,18 +74,22 @@ public class FSProjectLoader implements ProjectLoader {
             }
         }).map(pr -> pr.getResult().orElse(null))
                 .filter(Objects::nonNull)
-                .map(cu ->  {
-                    String clsName = cu.accept(new ClassNameVisitor(), null);
-                    List<Modifier> modifiersList = new ArrayList<>();
-                    cu.accept(new ModifierVisitor(), modifiersList);
-                    ClassMeta cls = new ClassMeta(clsName, modifiersList);
-                    cu.accept(new FieldVisitor(), cls);
-                    cu.accept(new MethodVisitor(), cls);
-                    cu.accept(new InnerClassVisitor(), cls);
-                    cls.getMethods().forEach(MethodMeta::resolveCalledMethods);
-                    return cls;
-                })
                 .collect(Collectors.toList());
+
+        LinkedHashMap<CompilationUnit, ClassMeta> classMetaForCUs = new LinkedHashMap<>();
+        cus.forEach(cu ->  {
+            String clsName = cu.accept(new ClassNameVisitor(), null);
+            List<Modifier> modifiersList = new ArrayList<>();
+            cu.accept(new ModifierVisitor(), modifiersList);
+            ClassMeta cls = new ClassMeta(clsName, modifiersList);
+            MetaHolder.addClass(cls);
+            cu.accept(new FieldVisitor(), cls);
+            cu.accept(new InnerClassVisitor(), cls);
+            classMetaForCUs.put(cu, cls);
+        });
+        classMetaForCUs.forEach((cu, cls) -> cu.accept(new MethodVisitor(), cls));
+        InnerClassVisitor.runInnerClassesMethodVisitors();
+        MetaHolder.forEach(ClassMeta::resolveMethodCalls);
     }
 
     private boolean isJar(Path file) {

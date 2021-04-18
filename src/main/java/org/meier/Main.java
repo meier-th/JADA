@@ -2,17 +2,19 @@ package org.meier;
 
 import org.meier.loader.FSProjectLoader;
 import org.meier.model.ClassMeta;
+import org.meier.model.MetaHolder;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
             FSProjectLoader loader = new FSProjectLoader();
-            List<ClassMeta> classes = loader.loadProject("/home/thom/IdeaProjects/communicator/src/main/java",
+            loader.loadProject("/home/thom/IdeaProjects/communicator/src/main/java",
                     "/home/thom/.gradle/caches/modules-2/files-2.1");
+            Map<String, ClassMeta> classes = MetaHolder.getClasses();
             System.out.println("done");
         } catch (IOException error) {
             System.out.println(error.getMessage());

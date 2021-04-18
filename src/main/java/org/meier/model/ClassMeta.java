@@ -10,15 +10,25 @@ public class ClassMeta implements Meta {
     private List<FieldMeta> fields = new ArrayList<>();
     private final List<ClassMeta> innerClasses = new ArrayList<>();
     private final List<Modifier> modifiers = new ArrayList<>();
+    private boolean nested = false;
 
     public ClassMeta(String fullName, List<Modifier> modifiers) {
         this.fullName = fullName;
         this.modifiers.addAll(modifiers);
     }
 
+    public ClassMeta(String fullName, List<Modifier> modifiers, boolean nested) {
+        this(fullName, modifiers);
+        this.nested = nested;
+    }
+
     public void resolveMethodCalls() {
         this.methods.forEach(MethodMeta::resolveCalledMethods);
         this.getInnerClasses().forEach(ClassMeta::resolveMethodCalls);
+    }
+
+    public boolean isNested() {
+        return this.nested;
     }
 
     @Override
