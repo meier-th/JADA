@@ -11,7 +11,6 @@ import org.meier.model.FieldMeta;
 import org.meier.model.MethodMeta;
 import org.meier.model.Modifier;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,8 +19,7 @@ public class MethodVisitor extends VoidVisitorAdapter<ClassMeta> {
 
     @Override
     public void visit(MethodDeclaration n, ClassMeta classMeta) {
-        List<Modifier> modifiersList = new ArrayList<>();
-        n.accept(new ModifierVisitor(), modifiersList);
+        List<Modifier> modifiersList = n.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.METHOD);
 
         String fullName = n.resolve().getQualifiedName();
 

@@ -23,9 +23,9 @@ public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
     public void visit(ClassOrInterfaceDeclaration n, ClassMeta cls) {
         ClassMeta clazz = cls;
         if (n.isNestedType() || n.isLocalClassDeclaration()) {
-            List<Modifier> modifiersList = new ArrayList<>();
-            n.accept(new ModifierVisitor(), modifiersList);
+            List<Modifier> modifiersList = n.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
             clazz = new ClassMeta(n.resolve().asReferenceType().getQualifiedName(), modifiersList, true);
+            MetaHolder.addClass(clazz);
             n.accept(new FieldVisitor(), clazz);
             innerClassesAstNodes.put(clazz, n);
             cls.getInnerClasses().add(clazz);

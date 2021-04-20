@@ -17,10 +17,9 @@ public class FieldVisitor extends VoidVisitorAdapter<ClassMeta> {
     @Override
     public void visit(FieldDeclaration fieldDecl, ClassMeta classMeta) {
         try {
-            List<Modifier> modifiersList = new ArrayList<>();
+            List<Modifier> modifiersList = fieldDecl.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.FIELD);
             List<NameTypeBean> names = new ArrayList<>();
             fieldDecl.accept(new NameTypeVisitor(), names);
-            fieldDecl.accept(new ModifierVisitor(), modifiersList);
             Set<Modifier> modifiers = Set.copyOf(modifiersList);
             classMeta.getFields().addAll(names.stream()
                     .map(nameTypeBean -> new FieldMeta(nameTypeBean.getName(), nameTypeBean.getFullClassName(), modifiers, classMeta))

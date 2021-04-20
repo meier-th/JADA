@@ -49,8 +49,7 @@ public class FSProjectLoader implements ProjectLoader {
     public ClassMeta loadFile(String filePath, String projectPath, String jarsDir) throws IOException {
             init(Paths.get(projectPath), Paths.get(jarsDir));
             CompilationUnit headNode = StaticJavaParser.parse(Paths.get(filePath));
-            List<Modifier> modifiersList = new ArrayList<>();
-            headNode.accept(new ModifierVisitor(), modifiersList);
+            List<Modifier> modifiersList = headNode.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
             return new ClassMeta(headNode.accept(new ClassNameVisitor(), null), modifiersList);
     }
 
@@ -79,8 +78,7 @@ public class FSProjectLoader implements ProjectLoader {
         LinkedHashMap<CompilationUnit, ClassMeta> classMetaForCUs = new LinkedHashMap<>();
         cus.forEach(cu ->  {
             String clsName = cu.accept(new ClassNameVisitor(), null);
-            List<Modifier> modifiersList = new ArrayList<>();
-            cu.accept(new ModifierVisitor(), modifiersList);
+            List<Modifier> modifiersList = cu.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
             ClassMeta cls = new ClassMeta(clsName, modifiersList);
             MetaHolder.addClass(cls);
             cu.accept(new FieldVisitor(), cls);
