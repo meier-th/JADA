@@ -15,6 +15,7 @@ public class Main {
             loader.loadProject("/home/thom/IdeaProjects/communicator/src/main/java",
                     "/home/thom/.gradle/caches/modules-2/files-2.1");
             Map<String, ClassMeta> classes = MetaHolder.getClasses();
+            System.out.println("done");
         } catch (IOException error) {
             System.out.println(error.getMessage());
         }

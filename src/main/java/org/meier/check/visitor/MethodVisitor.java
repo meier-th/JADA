@@ -22,19 +22,21 @@ public class MethodVisitor extends VoidVisitorAdapter<ClassMeta> {
         List<Modifier> modifiersList = n.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.METHOD);
 
         String fullName = n.resolve().getQualifiedName();
+        if (fullName.substring(0, fullName.lastIndexOf('.')).equals(classMeta.getFullName())) {
 
-        Type retType = n.getType();
-        String returnType = TypeResolver.getQualifiedName(retType);
+            Type retType = n.getType();
+            String returnType = TypeResolver.getQualifiedName(retType);
 
-        List<NameTypeBean> parameters = n.getParameters().stream().map(param ->
-                new NameTypeBean(param.getNameAsString(), TypeResolver.getQualifiedName(param.getType()))
-        ).collect(Collectors.toList());
+            List<NameTypeBean> parameters = n.getParameters().stream().map(param ->
+                    new NameTypeBean(param.getNameAsString(), TypeResolver.getQualifiedName(param.getType()))
+            ).collect(Collectors.toList());
 
-        List<FieldMeta> accessedFields = n.accept(new FieldsAccessVisitor(), null);
+            List<FieldMeta> accessedFields = n.accept(new FieldsAccessVisitor(), null);
 
-        List<CalledMethodBean> calledMethods = n.accept(new MethodCallVisitor(), null);
+            List<CalledMethodBean> calledMethods = n.accept(new MethodCallVisitor(), null);
 
-        MethodMeta method = new MethodMeta(fullName, Set.copyOf(modifiersList), parameters, accessedFields, calledMethods, returnType, classMeta);
-        classMeta.addMethod(method);
+            MethodMeta method = new MethodMeta(fullName, Set.copyOf(modifiersList), parameters, accessedFields, calledMethods, returnType, classMeta);
+            classMeta.addMethod(method);
+        }
     }
 }

@@ -2,6 +2,7 @@ package org.meier.check.visitor;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.GenericListVisitorAdapter;
@@ -14,7 +15,8 @@ public class ModifierVisitor extends GenericListVisitorAdapter<Modifier, Modifie
     public enum ModifierLevel {
         CLASS,
         METHOD,
-        FIELD
+        FIELD,
+        ENUM
     }
 
     @Override
@@ -23,7 +25,8 @@ public class ModifierVisitor extends GenericListVisitorAdapter<Modifier, Modifie
         Node node = n.getParentNode().orElse(null);
         if (node instanceof ClassOrInterfaceDeclaration && lvl == ModifierLevel.CLASS ||
             node instanceof MethodDeclaration && lvl == ModifierLevel.METHOD ||
-            node instanceof FieldDeclaration && lvl == ModifierLevel.FIELD)
+            node instanceof FieldDeclaration && lvl == ModifierLevel.FIELD ||
+            node instanceof EnumDeclaration && lvl == ModifierLevel.ENUM)
             modifiers.add(Modifier.toModifier(n.getKeyword()));
         return modifiers;
     }
