@@ -1,7 +1,7 @@
 package org.meier.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ClassMeta implements Meta {
 
@@ -11,6 +11,10 @@ public class ClassMeta implements Meta {
     private final List<ClassMeta> innerClasses = new ArrayList<>();
     private final List<Modifier> modifiers = new ArrayList<>();
     private boolean nested = false;
+    private final List<ClassMeta> projectExtendedClasses = new ArrayList<>();
+    private final List<ClassMeta> projectImplementedInterfaces = new ArrayList<>();
+    private final Set<String> extendedClasses = new HashSet<>();
+    private final Set<String> implementedInterfaces = new HashSet<>();
 
     public ClassMeta(String fullName, List<Modifier> modifiers) {
         this.fullName = fullName;
@@ -47,6 +51,39 @@ public class ClassMeta implements Meta {
     @Override
     public boolean isSynchronised() {
         return false;
+    }
+
+    public void setExtendedClasses(List<String> extendedClasses) {
+        this.extendedClasses.addAll(extendedClasses);
+    }
+
+    public void setImplementedInterfaces(List<String> implementedInterfaces) {
+        this.implementedInterfaces.addAll(implementedInterfaces);
+    }
+
+    public void resolveExtendedAndImplemented() {
+        this.projectExtendedClasses.addAll(this.extendedClasses.stream().map(MetaHolder::getClass).filter(Objects::nonNull).collect(Collectors.toList()));
+        this.projectImplementedInterfaces.addAll(this.implementedInterfaces.stream().map(MetaHolder::getClass).filter(Objects::nonNull).collect(Collectors.toList()));
+    }
+
+    public List<Modifier> getModifiers() {
+        return modifiers;
+    }
+
+    public List<ClassMeta> getProjectExtendedClasses() {
+        return projectExtendedClasses;
+    }
+
+    public List<ClassMeta> getProjectImplementedInterfaces() {
+        return projectImplementedInterfaces;
+    }
+
+    public Set<String> getExtendedClasses() {
+        return extendedClasses;
+    }
+
+    public Set<String> getImplementedInterfaces() {
+        return implementedInterfaces;
     }
 
     public String getFullName() {

@@ -12,6 +12,7 @@ import org.meier.model.Modifier;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
 
@@ -25,6 +26,7 @@ public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
     public void visit(EnumDeclaration n, ClassMeta cls) {
         List<Modifier> modifiers = n.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.ENUM);
         EnumMeta clazz = new EnumMeta(n.resolve().asEnum().getQualifiedName(), modifiers, true);
+        clazz.setImplementedInterfaces(n.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
         MetaHolder.addClass(clazz);
         n.accept(new FieldVisitor(), clazz);
         n.accept(new EnumVisitor(), clazz);
@@ -39,6 +41,8 @@ public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
         if (n.isNestedType() || n.isLocalClassDeclaration()) {
             List<Modifier> modifiersList = n.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
             clazz = new ClassMeta(n.resolve().asReferenceType().getQualifiedName(), modifiersList, true);
+            clazz.setExtendedClasses(n.getExtendedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+            clazz.setImplementedInterfaces(n.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
             MetaHolder.addClass(clazz);
             n.accept(new FieldVisitor(), clazz);
             innerClassesAstNodes.put(clazz, n);

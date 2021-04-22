@@ -3,6 +3,8 @@ package org.meier.loader;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -80,6 +82,14 @@ public class FSProjectLoader implements ProjectLoader {
             String clsName = cu.accept(new ClassNameVisitor(), null);
             List<Modifier> modifiersList = cu.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
             ClassMeta cls = new ClassMeta(clsName, modifiersList);
+            ClassOrInterfaceDeclaration clIntDecl = (ClassOrInterfaceDeclaration)cu.getChildNodes().stream().filter(node -> node instanceof ClassOrInterfaceDeclaration).findFirst().orElse(null);
+            EnumDeclaration enumDecl = (EnumDeclaration)cu.getChildNodes().stream().filter(node -> node instanceof EnumDeclaration).findFirst().orElse(null);
+            if (clIntDecl != null) {
+                cls.setExtendedClasses(clIntDecl.getExtendedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+                cls.setImplementedInterfaces(clIntDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+            } else if (enumDecl != null) {
+                cls.setImplementedInterfaces(enumDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+            }
             MetaHolder.addClass(cls);
             cu.accept(new FieldVisitor(), cls);
             cu.accept(new InnerClassVisitor(), cls);
@@ -87,6 +97,7 @@ public class FSProjectLoader implements ProjectLoader {
         });
         classMetaForCUs.forEach((cu, cls) -> cu.accept(new MethodVisitor(), cls));
         InnerClassVisitor.runInnerClassesMethodVisitors();
+        MetaHolder.forEach(ClassMeta::resolveExtendedAndImplemented);
         MetaHolder.forEach(ClassMeta::resolveMethodCalls);
     }
 
