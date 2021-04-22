@@ -28,7 +28,7 @@ public class MethodVisitor extends VoidVisitorAdapter<ClassMeta> {
             String returnType = TypeResolver.getQualifiedName(retType);
 
             List<NameTypeBean> parameters = n.getParameters().stream().map(param ->
-                    new NameTypeBean(param.getNameAsString(), TypeResolver.getQualifiedName(param.getType()))
+                    new NameTypeBean(param.getNameAsString(), TypeResolver.getQualifiedName(param.getType()), null)
             ).collect(Collectors.toList());
 
             List<FieldMeta> accessedFields = n.accept(new FieldsAccessVisitor(), null);
