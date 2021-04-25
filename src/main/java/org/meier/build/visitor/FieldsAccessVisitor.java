@@ -1,4 +1,4 @@
-package org.meier.check.visitor;
+package org.meier.build.visitor;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;

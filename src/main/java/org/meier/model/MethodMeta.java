@@ -49,6 +49,10 @@ public class MethodMeta implements Meta {
                 .collect(Collectors.toList());
     }
 
+    public String getShortName() {
+        return name.substring(name.lastIndexOf(".")+1);
+    }
+
     public List<CalledMethodBean> getCalledMethodsNames() {
         return calledMethodsNames;
     }

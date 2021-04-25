@@ -1,4 +1,4 @@
-package org.meier.check.util;
+package org.meier.build.util;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;

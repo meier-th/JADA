@@ -1,10 +1,10 @@
-package org.meier.check.visitor;
+package org.meier.build.visitor;
 
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import org.meier.bean.NameTypeBean;
-import org.meier.check.util.TypeResolver;
+import org.meier.build.util.TypeResolver;
 
 import java.util.List;
 

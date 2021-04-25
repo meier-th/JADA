@@ -14,7 +14,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
-import org.meier.check.visitor.*;
+import org.meier.build.visitor.*;
 import org.meier.model.ClassMeta;
 import org.meier.model.MetaHolder;
 import org.meier.model.Modifier;

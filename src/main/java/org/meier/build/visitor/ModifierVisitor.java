@@ -1,4 +1,4 @@
-package org.meier.check.visitor;
+package org.meier.build.visitor;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;

@@ -1,11 +1,11 @@
-package org.meier.check.visitor;
+package org.meier.build.visitor;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
-import org.meier.check.util.TypeResolver;
+import org.meier.build.util.TypeResolver;
 import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
 import org.meier.model.MethodMeta;

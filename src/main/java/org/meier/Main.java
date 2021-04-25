@@ -1,11 +1,14 @@
 package org.meier;
 
+import org.meier.check.FullReportUnorderedRuleRunner;
+import org.meier.check.UnorderedRuleRunner;
+import org.meier.check.rule.NonDescriptiveNamesRule;
+import org.meier.export.CliExporter;
+import org.meier.export.Exporter;
 import org.meier.loader.FSProjectLoader;
-import org.meier.model.ClassMeta;
 import org.meier.model.MetaHolder;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class Main {
 
@@ -14,8 +17,12 @@ public class Main {
             FSProjectLoader loader = new FSProjectLoader();
             loader.loadProject("/home/thom/IdeaProjects/communicator/src/main/java",
                     "/home/thom/.gradle/caches/modules-2/files-2.1");
-            Map<String, ClassMeta> classes = MetaHolder.getClasses();
-            System.out.println("done");
+            Exporter cliExporter = new CliExporter();
+            UnorderedRuleRunner runner = new FullReportUnorderedRuleRunner();
+            runner.setData(MetaHolder.getClasses().values());
+            runner.setExporter(cliExporter);
+            runner.addRule(new NonDescriptiveNamesRule());
+            runner.executeRules();
         } catch (IOException error) {
             System.out.println(error.getMessage());
         }
