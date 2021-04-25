@@ -1,5 +1,6 @@
 package org.meier.model;
 
+import com.github.javaparser.ast.body.MethodDeclaration;
 import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
 
@@ -19,8 +20,9 @@ public class MethodMeta implements Meta {
     private List<MethodMeta> calledMethods;
     private final List<CalledMethodBean> calledMethodsNames;
     private ClassMeta ownerClass;
+    private final MethodDeclaration content;
 
-    public MethodMeta(String name, Set<Modifier> modifiers, List<NameTypeBean> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass) {
+    public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<NameTypeBean> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass) {
         this.name = name;
         this.modifiers = modifiers;
         this.parameters = parameters;
@@ -28,6 +30,7 @@ public class MethodMeta implements Meta {
         this.calledMethodsNames = calledMethods;
         this.fullQualifiedReturnType = fullQualifiedReturnType;
         this.ownerClass = ownerClass;
+        this.content = content;
     }
 
     public void resolveCalledMethods() {
@@ -44,6 +47,14 @@ public class MethodMeta implements Meta {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    public List<CalledMethodBean> getCalledMethodsNames() {
+        return calledMethodsNames;
+    }
+
+    public MethodDeclaration getContent() {
+        return content;
     }
 
     public void setOwnerClass(ClassMeta cls) {

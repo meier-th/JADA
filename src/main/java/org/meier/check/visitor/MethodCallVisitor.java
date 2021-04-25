@@ -6,13 +6,9 @@ import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.visitor.GenericListVisitorAdapter;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import org.meier.bean.CalledMethodBean;
-import org.meier.model.ClassMeta;
-import org.meier.model.MetaHolder;
-import org.meier.model.MethodMeta;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MethodCallVisitor extends GenericListVisitorAdapter<CalledMethodBean, Void> {
 
