@@ -8,13 +8,14 @@ import org.meier.model.MetaHolder;
 
 import java.util.Collections;
 
-public class EnumVisitor extends VoidVisitorAdapter<EnumMeta> {
+public class EnumConstVisitor extends VoidVisitorAdapter<EnumMeta> {
 
     @Override
     public void visit(EnumConstantDeclaration n, EnumMeta parent) {
         EnumConstantMeta enumMeta = new EnumConstantMeta(parent.getFullName()+"."+n.resolve().asEnumConstant().getName(), Collections.emptyList(), true);
         parent.addEnumConstant(enumMeta);
         MetaHolder.addClass(enumMeta);
+        enumMeta.setStartLine(n.getBegin().get().line);
         n.accept(new FieldVisitor(), enumMeta);
         n.accept(new InnerClassVisitor(), enumMeta);
         n.accept(new MethodVisitor(), enumMeta);

@@ -28,8 +28,10 @@ public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
         EnumMeta clazz = new EnumMeta(n.resolve().asEnum().getQualifiedName(), modifiers, true);
         clazz.setImplementedInterfaces(n.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
         MetaHolder.addClass(clazz);
+        clazz.setStartLine(n.getBegin().get().line);
         n.accept(new FieldVisitor(), clazz);
-        n.accept(new EnumVisitor(), clazz);
+        n.accept(new EnumConstVisitor(), clazz);
+        n.accept(new InitializerBlocksVisitor(), clazz);
         innerClassesAstNodes.put(clazz, n);
         cls.getInnerClasses().add(clazz);
         super.visit(n, clazz);
@@ -44,7 +46,9 @@ public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
             clazz.setExtendedClasses(n.getExtendedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
             clazz.setImplementedInterfaces(n.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
             MetaHolder.addClass(clazz);
+            clazz.setStartLine(n.getBegin().get().line);
             n.accept(new FieldVisitor(), clazz);
+            n.accept(new InitializerBlocksVisitor(), clazz);
             innerClassesAstNodes.put(clazz, n);
             cls.getInnerClasses().add(clazz);
         }

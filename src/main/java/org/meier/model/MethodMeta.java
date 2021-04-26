@@ -4,7 +4,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -47,6 +46,11 @@ public class MethodMeta implements Meta {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public int getStartLine() {
+        return content.getBegin().get().line;
     }
 
     public String getShortName() {

@@ -9,6 +9,7 @@ public class FieldMeta implements Meta {
     private final String fullClassName;
     private final Set<Modifier> modifiers;
     private ClassMeta ownerClass;
+    private int startLine;
 
     public FieldMeta(String name, String fullClassName, Set<Modifier> modifiers, ClassMeta ownerClass) {
         this.name = name;
@@ -27,6 +28,15 @@ public class FieldMeta implements Meta {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public int getStartLine() {
+        return startLine;
+    }
+
+    public void setStartLine(int line) {
+        this.startLine = line;
     }
 
     public String getFullClassName() {

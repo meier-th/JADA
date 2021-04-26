@@ -1,8 +1,10 @@
 package org.meier.check.rule;
 
+import org.meier.bean.NameTypeBean;
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
 import org.meier.model.ClassMeta;
+import org.meier.model.CodeBlockMeta;
 import org.meier.model.FieldMeta;
 import org.meier.model.MethodMeta;
 
@@ -18,17 +20,40 @@ public class NonDescriptiveNamesRule implements Rule {
         classes.forEach(cls -> {
             List<MethodMeta> methods = cls.getMethods();
             List<FieldMeta> fields = cls.getFields();
-            methods.stream().map(MethodMeta::getShortName).filter(this::isNonDescriptive).forEach(name ->
+            List<CodeBlockMeta> initializerBlocks = cls.getCodeBlocks();
+            for (MethodMeta meth : methods) {
+                String methName = meth.getShortName();
+                if (isNonDescriptive(methName)) {
                     defects.add(DefectCase.newInstance()
-                    .setClassName(cls.getFullName())
-                    .setMethodName(name)
-                    .setDefectName("Non-descriptive method name")
-                    .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", name))));
-            fields.stream().map(FieldMeta::getName).filter(this::isNonDescriptive).forEach(name ->
+                            .setClassName(cls.getFullName())
+                            .setMethodName(methName)
+                            .setDefectName("Non-descriptive method name")
+                            .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", methName))
+                            .setLineNumber(meth.getStartLine()));
+                }
+            }
+            for (FieldMeta field: fields) {
+                String name = field.getName();
+                if (isNonDescriptive(name)) {
                     defects.add(DefectCase.newInstance()
-                    .setDefectName("Non-descriptive field name")
-                    .setClassName(cls.getFullName())
-                    .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", name))));
+                            .setDefectName("Non-descriptive field name")
+                            .setClassName(cls.getFullName())
+                            .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", name))
+                            .setLineNumber(field.getStartLine()));
+                }
+            }
+            for (CodeBlockMeta block : initializerBlocks) {
+                for (NameTypeBean variable : block.getVariables()) {
+                    String name = variable.getName();
+                    if (isNonDescriptive(name)) {
+                        defects.add(DefectCase.newInstance()
+                            .setDefectName("Non-descriptive variable name")
+                            .setClassName(cls.getFullName())
+                            .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", name))
+                            .setLineNumber(block.getStartLine()));
+                    }
+                }
+            }
         });
         return new RuleResult("Descriptive naming test", defects);
     }

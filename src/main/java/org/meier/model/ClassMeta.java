@@ -15,6 +15,8 @@ public class ClassMeta implements Meta {
     private final List<ClassMeta> projectImplementedInterfaces = new ArrayList<>();
     private final Set<String> extendedClasses = new HashSet<>();
     private final Set<String> implementedInterfaces = new HashSet<>();
+    private final List<CodeBlockMeta> codeBlocks = new ArrayList<>();
+    private int startLine;
 
     public ClassMeta(String fullName, List<Modifier> modifiers) {
         this.fullName = fullName;
@@ -31,8 +33,25 @@ public class ClassMeta implements Meta {
         this.getInnerClasses().forEach(ClassMeta::resolveMethodCalls);
     }
 
+    public List<CodeBlockMeta> getCodeBlocks() {
+        return codeBlocks;
+    }
+
+    public void addCodeBlock(CodeBlockMeta codeBlock) {
+        this.codeBlocks.add(codeBlock);
+    }
+
     public boolean isNested() {
         return this.nested;
+    }
+
+    @Override
+    public int getStartLine() {
+        return startLine;
+    }
+
+    public void setStartLine(int line) {
+        this.startLine = line;
     }
 
     @Override

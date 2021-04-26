@@ -82,6 +82,7 @@ public class FSProjectLoader implements ProjectLoader {
             String clsName = cu.accept(new ClassNameVisitor(), null);
             List<Modifier> modifiersList = cu.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
             ClassMeta cls = new ClassMeta(clsName, modifiersList);
+            cls.setStartLine(cu.getBegin().get().line);
             ClassOrInterfaceDeclaration clIntDecl = (ClassOrInterfaceDeclaration)cu.getChildNodes().stream().filter(node -> node instanceof ClassOrInterfaceDeclaration).findFirst().orElse(null);
             EnumDeclaration enumDecl = (EnumDeclaration)cu.getChildNodes().stream().filter(node -> node instanceof EnumDeclaration).findFirst().orElse(null);
             if (clIntDecl != null) {
@@ -90,6 +91,7 @@ public class FSProjectLoader implements ProjectLoader {
             } else if (enumDecl != null) {
                 cls.setImplementedInterfaces(enumDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
             }
+            cu.accept(new InitializerBlocksVisitor(), cls);
             MetaHolder.addClass(cls);
             cu.accept(new FieldVisitor(), cls);
             cu.accept(new InnerClassVisitor(), cls);
