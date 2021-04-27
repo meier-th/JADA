@@ -97,7 +97,9 @@ public class SingleResponsibilityRule implements Rule {
 
                     if (commonAccessedFields.get(method) != null) {
                         commonAccessedFields.get(method).forEach((key, value) -> {
-                            if (value >= finalLargestCommonFieldsValue / 3) {
+                            if (value >= finalLargestCommonFieldsValue / 3 ||
+                                method.getCalledMethods().contains(key) ||
+                                key.getCalledMethods().contains(method)) {
                                 methodGroup.push(key);
                             }
                         });
