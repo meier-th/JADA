@@ -31,6 +31,15 @@ public class NonDescriptiveNamesRule implements Rule {
                             .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", methName))
                             .setLineNumber(meth.getStartLine()));
                 }
+                for (NameTypeBean variable : meth.getVariables()) {
+                    if (isNonDescriptive(variable.getName())) {
+                        defects.add(DefectCase.newInstance()
+                                .setDefectName("Non-descriptive variable name")
+                                .setClassName(cls.getFullName())
+                                .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", variable.getName()))
+                                .setLineNumber(meth.getStartLine()));
+                    }
+                }
             }
             for (FieldMeta field: fields) {
                 String name = field.getName();

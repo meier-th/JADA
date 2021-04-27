@@ -3,6 +3,7 @@ package org.meier;
 import org.meier.check.FullReportUnorderedRuleRunner;
 import org.meier.check.UnorderedRuleRunner;
 import org.meier.check.rule.NonDescriptiveNamesRule;
+import org.meier.check.rule.SingleResponsibilityRule;
 import org.meier.export.CliExporter;
 import org.meier.export.Exporter;
 import org.meier.loader.FSProjectLoader;
@@ -25,6 +26,7 @@ public class Main {
             runner.setData(MetaHolder.getClasses().values());
             runner.setExporter(cliExporter);
             runner.addRule(new NonDescriptiveNamesRule());
+            runner.addRule(new SingleResponsibilityRule());
             runner.executeRules();
         } catch (IOException error) {
             System.out.println(error.getMessage());

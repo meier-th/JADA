@@ -6,7 +6,7 @@ import org.meier.bean.NameTypeBean;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CodeBlockMeta implements Meta {
+public class CodeBlockMeta implements Meta, CodeContainer {
 
     private List<NameTypeBean> variables;
     private InitializerDeclaration code;
@@ -22,12 +22,14 @@ public class CodeBlockMeta implements Meta {
         return new CodeBlockMeta();
     }
 
+    @Override
     public void addVariable(NameTypeBean variable) {
         if (variables == null)
             variables = new ArrayList<>();
         this.variables.add(variable);
     }
 
+    @Override
     public List<NameTypeBean> getVariables() {
         return variables;
     }

@@ -4,12 +4,10 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class MethodMeta implements Meta {
+public class MethodMeta implements Meta, CodeContainer {
 
     private final String name;
     private final String fullQualifiedReturnType;
@@ -20,6 +18,7 @@ public class MethodMeta implements Meta {
     private final List<CalledMethodBean> calledMethodsNames;
     private ClassMeta ownerClass;
     private final MethodDeclaration content;
+    private List<NameTypeBean> variables;
 
     public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<NameTypeBean> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass) {
         this.name = name;
@@ -51,6 +50,22 @@ public class MethodMeta implements Meta {
     @Override
     public int getStartLine() {
         return content.getBegin().get().line;
+    }
+
+    @Override
+    public List<NameTypeBean> getVariables() {
+        return variables == null ? Collections.emptyList() : variables;
+    }
+
+    @Override
+    public void addVariable(NameTypeBean variable) {
+        if (variables == null)
+            variables = new ArrayList<>();
+        variables.add(variable);
+    }
+
+    public void setVariables(List<NameTypeBean> vars) {
+        this.variables = vars;
     }
 
     public String getShortName() {
