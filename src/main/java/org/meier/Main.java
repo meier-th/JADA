@@ -2,6 +2,7 @@ package org.meier;
 
 import org.meier.check.FullReportUnorderedRuleRunner;
 import org.meier.check.UnorderedRuleRunner;
+import org.meier.check.rule.DependencyInversionRule;
 import org.meier.check.rule.NonDescriptiveNamesRule;
 import org.meier.check.rule.SingleResponsibilityRule;
 import org.meier.export.CliExporter;
@@ -27,6 +28,7 @@ public class Main {
             runner.setExporter(cliExporter);
             runner.addRule(new NonDescriptiveNamesRule());
             runner.addRule(new SingleResponsibilityRule());
+            runner.addRule(new DependencyInversionRule());
             runner.executeRules();
         } catch (IOException error) {
             System.out.println(error.getMessage());

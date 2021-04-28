@@ -30,6 +30,7 @@ public class ClassMeta implements Meta {
 
     public void resolveMethodCalls() {
         this.methods.forEach(MethodMeta::resolveCalledMethods);
+        this.codeBlocks.forEach(CodeBlockMeta::resolveCalledMethods);
         this.getInnerClasses().forEach(ClassMeta::resolveMethodCalls);
     }
 

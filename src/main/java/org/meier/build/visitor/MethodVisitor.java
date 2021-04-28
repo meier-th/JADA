@@ -23,12 +23,12 @@ public class MethodVisitor extends VoidVisitorAdapter<ClassMeta> {
 
         String fullName = n.resolve().getQualifiedName();
         if (fullName.substring(0, fullName.lastIndexOf('.')).equals(classMeta.getFullName())) {
-
             Type retType = n.getType();
-            String returnType = TypeResolver.getQualifiedName(retType);
+            String returnType = n.isGeneric() ? TypeResolver.getQualifiedGenericTypeName(n, retType) : TypeResolver.getQualifiedName(retType);
 
             List<NameTypeBean> parameters = n.getParameters().stream().map(param ->
-                    new NameTypeBean(param.getNameAsString(), TypeResolver.getQualifiedName(param.getType()), null)
+                    new NameTypeBean(param.getNameAsString(), n.isGeneric() ? TypeResolver.getQualifiedGenericTypeName(n, param.getType()) :
+                            TypeResolver.getQualifiedName(param.getType()), null)
             ).collect(Collectors.toList());
 
             List<FieldMeta> accessedFields = n.accept(new FieldsAccessVisitor(), null);

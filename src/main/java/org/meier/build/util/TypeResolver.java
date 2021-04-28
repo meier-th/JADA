@@ -1,13 +1,31 @@
 package org.meier.build.util;
 
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.resolution.types.ResolvedType;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TypeResolver {
+
+    public static String getQualifiedGenericTypeName(MethodDeclaration method, Type checkType) {
+        try {
+            return getQualifiedName(checkType);
+        } catch (UnsupportedOperationException error) {
+            String retType = checkType.asString();
+                List<TypeParameter> parameters = method.getTypeParameters().stream().filter(param -> retType.contains(param.getName().asString())).collect(Collectors.toList());
+                String ret = retType;
+                for (TypeParameter param : parameters) {
+                    ret = ret.replace(param.getName().asString(), getQualifiedName(param.getTypeBound().get(0)));
+                }
+                return ret;
+        }
+    }
 
     public static String getQualifiedName(Type type) {
         return getQualifiedNameFromResolved(type, type.resolve());

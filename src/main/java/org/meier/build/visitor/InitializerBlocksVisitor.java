@@ -2,10 +2,12 @@ package org.meier.build.visitor;
 
 import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import org.meier.bean.CalledMethodBean;
 import org.meier.model.ClassMeta;
 import org.meier.model.CodeBlockMeta;
 import org.meier.model.Modifier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InitializerBlocksVisitor extends VoidVisitorAdapter<ClassMeta> {
@@ -16,7 +18,8 @@ public class InitializerBlocksVisitor extends VoidVisitorAdapter<ClassMeta> {
         CodeBlockMeta block = CodeBlockMeta.newInstance()
                 .setStaticBlock(modifiersList.contains(Modifier.STATIC))
                 .setCode(n)
-                .setStartLine(n.getBegin().get().line);
+                .setStartLine(n.getBegin().get().line)
+                .setCalledMethodsNames(n.accept(new MethodCallVisitor(), null));
         n.accept(new VariablesVisitor(), block);
         arg.addCodeBlock(block);
     }

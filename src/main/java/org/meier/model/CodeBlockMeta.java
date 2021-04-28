@@ -1,10 +1,13 @@
 package org.meier.model;
 
 import com.github.javaparser.ast.body.InitializerDeclaration;
+import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class CodeBlockMeta implements Meta, CodeContainer {
 
@@ -12,6 +15,8 @@ public class CodeBlockMeta implements Meta, CodeContainer {
     private InitializerDeclaration code;
     private boolean staticBlock;
     private int startLine;
+    private List<MethodMeta> calledMethods;
+    private List<CalledMethodBean> calledMethodsNames;
 
     public CodeBlockMeta setStaticBlock(boolean staticBlock) {
         this.staticBlock = staticBlock;
@@ -20,6 +25,40 @@ public class CodeBlockMeta implements Meta, CodeContainer {
 
     public static CodeBlockMeta newInstance() {
         return new CodeBlockMeta();
+    }
+
+    public void resolveCalledMethods() {
+        calledMethods = calledMethodsNames.stream()
+                .map(meth -> {
+                    ClassMeta ownerClass = MetaHolder.getClass(meth.getClassName());
+                    if (ownerClass != null) {
+                        return ownerClass.getMethods()
+                                .stream()
+                                .filter(mt -> mt.getName().equals(meth.getFullMethodName()))
+                                .findFirst().orElse(null);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public List<MethodMeta> getCalledMethods() {
+        return calledMethods;
+    }
+
+    public CodeBlockMeta setCalledMethods(List<MethodMeta> calledMethods) {
+        this.calledMethods = calledMethods;
+        return this;
+    }
+
+    public List<CalledMethodBean> getCalledMethodsNames() {
+        return calledMethodsNames;
+    }
+
+    public CodeBlockMeta setCalledMethodsNames(List<CalledMethodBean> calledMethodsNames) {
+        this.calledMethodsNames = calledMethodsNames;
+        return this;
     }
 
     @Override
