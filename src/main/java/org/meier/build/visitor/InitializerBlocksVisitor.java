@@ -19,7 +19,8 @@ public class InitializerBlocksVisitor extends VoidVisitorAdapter<ClassMeta> {
                 .setStaticBlock(modifiersList.contains(Modifier.STATIC))
                 .setCode(n)
                 .setStartLine(n.getBegin().get().line)
-                .setCalledMethodsNames(n.accept(new MethodCallVisitor(), null));
+                .setCalledMethodsNames(n.accept(new MethodCallVisitor(), null))
+                .setOwnerClass(arg);
         n.accept(new VariablesVisitor(), block);
         arg.addCodeBlock(block);
     }

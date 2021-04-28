@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public class CodeBlockMeta implements Meta, CodeContainer {
 
     private List<NameTypeBean> variables;
+    private ClassMeta ownerClass;
     private InitializerDeclaration code;
     private boolean staticBlock;
     private int startLine;
@@ -41,6 +42,16 @@ public class CodeBlockMeta implements Meta, CodeContainer {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        calledMethods.forEach(meth -> meth.addCalledBy(this.ownerClass));
+    }
+
+    public ClassMeta getOwnerClass() {
+        return ownerClass;
+    }
+
+    public CodeBlockMeta setOwnerClass(ClassMeta ownerClass) {
+        this.ownerClass = ownerClass;
+        return this;
     }
 
     public List<MethodMeta> getCalledMethods() {

@@ -19,6 +19,7 @@ public class MethodMeta implements Meta, CodeContainer {
     private ClassMeta ownerClass;
     private final MethodDeclaration content;
     private List<NameTypeBean> variables;
+    private final Set<ClassMeta> calledBy = new HashSet<>();
 
     public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<NameTypeBean> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass) {
         this.name = name;
@@ -45,6 +46,15 @@ public class MethodMeta implements Meta, CodeContainer {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        calledMethods.forEach(meth -> meth.addCalledBy(this.ownerClass));
+    }
+
+    public void addCalledBy(ClassMeta cls) {
+        this.calledBy.add(cls);
+    }
+
+    public Set<ClassMeta> getCalledBy() {
+        return calledBy;
     }
 
     @Override
