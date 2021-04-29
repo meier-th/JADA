@@ -1,11 +1,10 @@
 package org.meier;
 
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import org.meier.check.FullReportUnorderedRuleRunner;
 import org.meier.check.UnorderedRuleRunner;
-import org.meier.check.rule.DependencyInversionRule;
-import org.meier.check.rule.EncapsulationRule;
-import org.meier.check.rule.NonDescriptiveNamesRule;
-import org.meier.check.rule.SingleResponsibilityRule;
+import org.meier.check.rule.*;
 import org.meier.export.CliExporter;
 import org.meier.export.Exporter;
 import org.meier.loader.FSProjectLoader;
@@ -31,6 +30,7 @@ public class Main {
             runner.addRule(new SingleResponsibilityRule());
             runner.addRule(new DependencyInversionRule());
             runner.addRule(new EncapsulationRule());
+            runner.addRule(new FactoryMethodRule());
             runner.executeRules();
         } catch (IOException error) {
             System.out.println(error.getMessage());

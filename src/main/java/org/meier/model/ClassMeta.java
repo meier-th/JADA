@@ -13,6 +13,8 @@ public class ClassMeta implements Meta {
     private boolean nested = false;
     private final List<ClassMeta> projectExtendedClasses = new ArrayList<>();
     private final List<ClassMeta> projectImplementedInterfaces = new ArrayList<>();
+    private final List<ClassMeta> projectExtendedBy = new ArrayList<>();
+    private final List<ClassMeta> projectImplementedBy = new ArrayList<>();
     private final Set<String> extendedClasses = new HashSet<>();
     private final Set<String> implementedInterfaces = new HashSet<>();
     private final List<CodeBlockMeta> codeBlocks = new ArrayList<>();
@@ -32,6 +34,22 @@ public class ClassMeta implements Meta {
         this.methods.forEach(MethodMeta::resolveCalledMethods);
         this.codeBlocks.forEach(CodeBlockMeta::resolveCalledMethods);
         this.getInnerClasses().forEach(ClassMeta::resolveMethodCalls);
+    }
+
+    public void addExtendedBy(ClassMeta cls) {
+        this.projectExtendedBy.add(cls);
+    }
+
+    public void addImplementedBy(ClassMeta cls) {
+        this.projectImplementedBy.add(cls);
+    }
+
+    public List<ClassMeta> getProjectExtendedBy() {
+        return projectExtendedBy;
+    }
+
+    public List<ClassMeta> getProjectImplementedBy() {
+        return projectImplementedBy;
     }
 
     public List<CodeBlockMeta> getCodeBlocks() {
@@ -84,6 +102,8 @@ public class ClassMeta implements Meta {
     public void resolveExtendedAndImplemented() {
         this.projectExtendedClasses.addAll(this.extendedClasses.stream().map(MetaHolder::getClass).filter(Objects::nonNull).collect(Collectors.toList()));
         this.projectImplementedInterfaces.addAll(this.implementedInterfaces.stream().map(MetaHolder::getClass).filter(Objects::nonNull).collect(Collectors.toList()));
+        this.projectExtendedClasses.forEach(cls -> cls.addExtendedBy(this));
+        this.projectImplementedInterfaces.forEach(cls -> cls.addImplementedBy(this));
     }
 
     public List<Modifier> getModifiers() {

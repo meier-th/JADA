@@ -12,7 +12,7 @@ public class MethodMeta implements Meta, CodeContainer {
     private final String name;
     private final String fullQualifiedReturnType;
     private final Set<Modifier> modifiers;
-    private final List<NameTypeBean> parameters;
+    private final List<Parameter> parameters;
     private final List<FieldMeta> accessedFields;
     private List<MethodMeta> calledMethods;
     private final List<CalledMethodBean> calledMethodsNames;
@@ -21,7 +21,7 @@ public class MethodMeta implements Meta, CodeContainer {
     private List<NameTypeBean> variables;
     private final Set<ClassMeta> calledBy = new HashSet<>();
 
-    public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<NameTypeBean> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass) {
+    public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<Parameter> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass) {
         this.name = name;
         this.modifiers = modifiers;
         this.parameters = parameters;
@@ -99,7 +99,7 @@ public class MethodMeta implements Meta, CodeContainer {
     }
 
     private String buildParamsString() {
-        return this.parameters.stream().map(NameTypeBean::getFullClassName).collect(Collectors.joining(", "));
+        return this.parameters.stream().map(Parameter::getTypeName).collect(Collectors.joining(", "));
     }
 
     public void addCalledMethod(MethodMeta callee) {
@@ -118,7 +118,7 @@ public class MethodMeta implements Meta, CodeContainer {
         return fullQualifiedReturnType;
     }
 
-    public List<NameTypeBean> getParameters() {
+    public List<Parameter> getParameters() {
         return parameters;
     }
 
