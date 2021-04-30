@@ -2,6 +2,7 @@ package org.meier.check.rule;
 
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
+import org.meier.check.rule.visitor.CreateIfNullVisitor;
 import org.meier.check.rule.visitor.ObjectCreationVisitor;
 import org.meier.check.rule.visitor.SynchronisedBlockVisitor;
 import org.meier.model.ClassMeta;
@@ -64,11 +65,14 @@ public class SingletonRule implements Rule {
 
     private boolean isInstanceCreationThreadSafe(ClassMeta cls) {
         MethodMeta instanceMethod = getInstanceMethod(cls);
+        FieldMeta instanceField = getInstanceField(cls);
         if (instanceMethod.getContent().accept(new ObjectCreationVisitor(), cls).size() == 0)
             return true;
-        if (instanceMethod.isSynchronised())
+        Boolean createsIfNull = instanceMethod.getContent().accept(new CreateIfNullVisitor(), instanceField);
+        if (instanceMethod.isSynchronised() && createsIfNull != null && createsIfNull)
             return true;
-        if (instanceMethod.getCalledMethods().stream().map(MethodMeta::getOwnerClass).anyMatch(clazz -> clazz.getFullName().startsWith("java.util.concurrent.")))
+        if (instanceMethod.getCalledMethods().stream().map(MethodMeta::getOwnerClass).anyMatch(clazz -> clazz.getFullName().startsWith("java.util.concurrent.")) &&
+            createsIfNull != null && createsIfNull)
             return true;
         Boolean threadSafe = instanceMethod.getContent().accept(new SynchronisedBlockVisitor(), getInstanceField(cls));
         return threadSafe != null && threadSafe;
