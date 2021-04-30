@@ -19,6 +19,7 @@ public class ClassMeta implements Meta {
     private final Set<String> implementedInterfaces = new HashSet<>();
     private final List<CodeBlockMeta> codeBlocks = new ArrayList<>();
     private int startLine;
+    private List<ConstructorMeta> constructors = new ArrayList<>();
 
     public ClassMeta(String fullName, List<Modifier> modifiers) {
         this.fullName = fullName;
@@ -38,6 +39,18 @@ public class ClassMeta implements Meta {
 
     public void addExtendedBy(ClassMeta cls) {
         this.projectExtendedBy.add(cls);
+    }
+
+    public void addConstructor(ConstructorMeta constructor) {
+        constructors.add(constructor);
+    }
+
+    public List<ConstructorMeta> getConstructors() {
+        return constructors;
+    }
+
+    public void setConstructors(List<ConstructorMeta> constructors) {
+        this.constructors = constructors;
     }
 
     public void addImplementedBy(ClassMeta cls) {

@@ -31,6 +31,7 @@ public class Main {
             runner.addRule(new DependencyInversionRule());
             runner.addRule(new EncapsulationRule());
             runner.addRule(new FactoryMethodRule());
+            runner.addRule(new SingletonRule());
             runner.executeRules();
         } catch (IOException error) {
             System.out.println(error.getMessage());

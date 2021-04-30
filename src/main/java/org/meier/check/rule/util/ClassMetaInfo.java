@@ -1,6 +1,9 @@
 package org.meier.check.rule.util;
 
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.stmt.IfStmt;
 import org.meier.model.ClassMeta;
+import org.meier.model.FieldMeta;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +35,26 @@ public final class ClassMetaInfo {
                 return false;
             return cls.getMethods().stream().anyMatch(field -> meth.getShortName().equalsIgnoreCase("set"+field.getShortName()));
         });
+    }
+
+    public static boolean isNullComparison(IfStmt ifStmt, FieldMeta field) {
+        if (!ifStmt.getCondition().isBinaryExpr())
+            return false;
+        BinaryExpr comparison = ifStmt.getCondition().asBinaryExpr();
+        if (!comparison.getOperator().equals(BinaryExpr.Operator.EQUALS))
+            return false;
+        return comparison.getLeft().isNullLiteralExpr() && comparison.getRight().isNameExpr() && comparison.getRight().asNameExpr().toString().equals(field.getName()) ||
+                comparison.getRight().isNullLiteralExpr() && comparison.getLeft().isNameExpr() && comparison.getLeft().asNameExpr().toString().equals(field.getName());
+    }
+
+    public static boolean isNotNullComparison(IfStmt ifStmt, FieldMeta field) {
+        if (!ifStmt.getCondition().isBinaryExpr())
+            return false;
+        BinaryExpr comparison = ifStmt.getCondition().asBinaryExpr();
+        if (!comparison.getOperator().equals(BinaryExpr.Operator.NOT_EQUALS))
+            return false;
+        return comparison.getLeft().isNullLiteralExpr() && comparison.getRight().isNameExpr() && comparison.getRight().asNameExpr().toString().equals(field.getName()) ||
+                comparison.getRight().isNullLiteralExpr() && comparison.getLeft().isNameExpr() && comparison.getLeft().asNameExpr().toString().equals(field.getName());
     }
 
 }

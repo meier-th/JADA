@@ -94,6 +94,7 @@ public class FSProjectLoader implements ProjectLoader {
             cu.accept(new InitializerBlocksVisitor(), cls);
             MetaHolder.addClass(cls);
             cu.accept(new FieldVisitor(), cls);
+            cu.accept(new ConstructorVisitor(), cls);
             cu.accept(new InnerClassVisitor(), cls);
             classMetaForCUs.put(cu, cls);
         });

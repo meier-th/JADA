@@ -30,6 +30,7 @@ public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
         MetaHolder.addClass(clazz);
         clazz.setStartLine(n.getBegin().get().line);
         n.accept(new FieldVisitor(), clazz);
+        n.accept(new ConstructorVisitor(), clazz);
         n.accept(new EnumConstVisitor(), clazz);
         n.accept(new InitializerBlocksVisitor(), clazz);
         innerClassesAstNodes.put(clazz, n);
@@ -48,6 +49,7 @@ public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
             MetaHolder.addClass(clazz);
             clazz.setStartLine(n.getBegin().get().line);
             n.accept(new FieldVisitor(), clazz);
+            n.accept(new ConstructorVisitor(), clazz);
             n.accept(new InitializerBlocksVisitor(), clazz);
             innerClassesAstNodes.put(clazz, n);
             cls.getInnerClasses().add(clazz);

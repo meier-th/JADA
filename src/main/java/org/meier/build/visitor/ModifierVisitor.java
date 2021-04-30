@@ -14,7 +14,8 @@ public class ModifierVisitor extends GenericListVisitorAdapter<Modifier, Modifie
         METHOD,
         FIELD,
         ENUM,
-        CODE_BLOCK
+        CODE_BLOCK,
+        CONSTRUCTOR
     }
 
     @Override
@@ -25,7 +26,8 @@ public class ModifierVisitor extends GenericListVisitorAdapter<Modifier, Modifie
             node instanceof MethodDeclaration && lvl == ModifierLevel.METHOD ||
             node instanceof FieldDeclaration && lvl == ModifierLevel.FIELD ||
             node instanceof EnumDeclaration && lvl == ModifierLevel.ENUM ||
-            node instanceof InitializerDeclaration && lvl == ModifierLevel.CODE_BLOCK)
+            node instanceof InitializerDeclaration && lvl == ModifierLevel.CODE_BLOCK ||
+            node instanceof ConstructorDeclaration && lvl == ModifierLevel.CONSTRUCTOR)
             modifiers.add(Modifier.toModifier(n.getKeyword()));
         return modifiers;
     }
