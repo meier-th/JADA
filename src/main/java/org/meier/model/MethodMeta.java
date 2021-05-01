@@ -1,6 +1,7 @@
 package org.meier.model;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.type.Type;
 import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
 
@@ -20,8 +21,9 @@ public class MethodMeta implements Meta, CodeContainer {
     private final MethodDeclaration content;
     private List<NameTypeBean> variables;
     private final Set<ClassMeta> calledBy = new HashSet<>();
+    private final Type returnType;
 
-    public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<Parameter> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass) {
+    public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<Parameter> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass, Type returnType) {
         this.name = name;
         this.modifiers = modifiers;
         this.parameters = parameters;
@@ -30,6 +32,7 @@ public class MethodMeta implements Meta, CodeContainer {
         this.fullQualifiedReturnType = fullQualifiedReturnType;
         this.ownerClass = ownerClass;
         this.content = content;
+        this.returnType = returnType;
     }
 
     public void resolveCalledMethods() {
@@ -96,6 +99,10 @@ public class MethodMeta implements Meta, CodeContainer {
 
     public String getUniqueName() {
         return name+"("+buildParamsString()+")";
+    }
+
+    public Type getReturnType() {
+        return returnType;
     }
 
     private String buildParamsString() {

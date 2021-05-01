@@ -1,7 +1,5 @@
 package org.meier;
 
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.type.Type;
 import org.meier.check.FullReportUnorderedRuleRunner;
 import org.meier.check.UnorderedRuleRunner;
 import org.meier.check.rule.*;
@@ -32,6 +30,7 @@ public class Main {
             runner.addRule(new EncapsulationRule());
             runner.addRule(new FactoryMethodRule());
             runner.addRule(new SingletonRule());
+            runner.addRule(new DecoratorRule());
             runner.executeRules();
         } catch (IOException error) {
             System.out.println(error.getMessage());

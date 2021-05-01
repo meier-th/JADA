@@ -2,7 +2,6 @@ package org.meier.model;
 
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
-import com.github.javaparser.resolution.types.ResolvedType;
 
 import java.util.List;
 
@@ -12,28 +11,6 @@ public class Parameter {
     private String typeName;
     private List<TypeParameter> genericParams;
     private Type type;
-
-    public boolean allowsInOverridden(Parameter overriddenParameter) {
-        ResolvedType parentType = getResolvedType();
-        ResolvedType childType = overriddenParameter.getResolvedType();
-        if (parentType == null)
-            return true;
-        if (childType == null)
-            return false;
-        return parentType.isAssignableBy(childType);
-    }
-
-    private ResolvedType getResolvedType() {
-        try {
-            return type.resolve();
-        } catch (UnsupportedOperationException error) {
-            try {
-                return type.asTypeParameter().resolve();
-            } catch (IllegalStateException err) {
-                return null;
-            }
-        }
-    }
 
     public Parameter(String name, String typeName, List<TypeParameter> genericParams, Type type) {
         this.name = name;

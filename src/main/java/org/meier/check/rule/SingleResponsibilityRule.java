@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class SingleResponsibilityRule implements Rule {
 
-    private final double GROUP_SEPARATOR_TRESHOLD = 0.3;
+    private final double GROUP_SEPARATOR_THRESHOLD = 0.3;
 
     @Override
     public RuleResult executeRule(Collection<ClassMeta> classes) {
@@ -99,7 +99,7 @@ public class SingleResponsibilityRule implements Rule {
 
                     if (commonAccessedFields.get(method) != null) {
                         commonAccessedFields.get(method).forEach((key, value) -> {
-                            if (value >= finalLargestCommonFieldsValue * GROUP_SEPARATOR_TRESHOLD ||
+                            if (value >= finalLargestCommonFieldsValue * GROUP_SEPARATOR_THRESHOLD ||
                                 method.getCalledMethods().contains(key) ||
                                 key.getCalledMethods().contains(method)) {
                                 methodGroup.push(key);

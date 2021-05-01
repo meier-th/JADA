@@ -3,6 +3,7 @@ package org.meier.check.rule;
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
 import org.meier.check.rule.util.ClassMetaInfo;
+import org.meier.check.rule.util.TypeInfo;
 import org.meier.check.rule.visitor.IfSwitchVisitor;
 import org.meier.check.rule.visitor.ObjectCreationVisitor;
 import org.meier.model.ClassMeta;
@@ -46,10 +47,6 @@ public class FactoryMethodRule implements Rule {
         return MetaHolder.getClasses().containsKey(method.getFullQualifiedReturnType());
     }
 
-    private boolean isAncestor(ClassMeta parent, ClassMeta child) {
-        return ClassMetaInfo.getAllAncestors(child).contains(parent);
-    }
-
     private boolean overriddenMethod(MethodMeta parentMethod, MethodMeta childMethod) {
         if (!parentMethod.getShortName().equals(childMethod.getShortName()))
             return false;
@@ -57,16 +54,11 @@ public class FactoryMethodRule implements Rule {
             return false;
         if (returnsProjectClass(parentMethod) ^ returnsProjectClass(childMethod))
             return false;
-        if (returnsProjectClass(parentMethod)) {
-            ClassMeta firstReturn = MetaHolder.getClass(parentMethod.getFullQualifiedReturnType());
-            ClassMeta secondReturn = MetaHolder.getClass(childMethod.getFullQualifiedReturnType());
-            if (firstReturn != secondReturn && !isAncestor(firstReturn, secondReturn))
-                return false;
-        } else if (!parentMethod.getFullQualifiedReturnType().equals(childMethod.getFullQualifiedReturnType())) {
+        if (!TypeInfo.isDescendant(parentMethod.getReturnType(), childMethod.getReturnType())) {
             return false;
         }
         for (int i = 0; i < parentMethod.getParameters().size(); ++i) {
-            if (!parentMethod.getParameters().get(i).allowsInOverridden(childMethod.getParameters().get(i)))
+            if (!TypeInfo.isDescendant(parentMethod.getParameters().get(i).getType(), childMethod.getParameters().get(i).getType()))
                 return false;
         }
         return true;

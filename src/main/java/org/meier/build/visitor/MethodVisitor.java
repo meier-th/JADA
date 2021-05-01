@@ -31,7 +31,7 @@ public class MethodVisitor extends VoidVisitorAdapter<ClassMeta> {
 
             List<CalledMethodBean> calledMethods = n.accept(new MethodCallVisitor(), null);
 
-            MethodMeta method = new MethodMeta(n, fullName, Set.copyOf(modifiersList), parameters, accessedFields, calledMethods, returnType, classMeta);
+            MethodMeta method = new MethodMeta(n, fullName, Set.copyOf(modifiersList), parameters, accessedFields, calledMethods, returnType, classMeta, retType);
             n.accept(new VariablesVisitor(), method);
             classMeta.addMethod(method);
         }
