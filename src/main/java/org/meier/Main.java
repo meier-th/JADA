@@ -31,6 +31,7 @@ public class Main {
             runner.addRule(new FactoryMethodRule());
             runner.addRule(new SingletonRule());
             runner.addRule(new DecoratorRule());
+            runner.addRule(new VisitorRule());
             runner.executeRules();
         } catch (IOException error) {
             System.out.println(error.getMessage());
