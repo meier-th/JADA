@@ -12,11 +12,8 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,23 +26,26 @@ public class RunnerConfigurator {
         setUpReflections();
     }
 
-    public void configureRunner() throws Exception {
-        Field runnerField = Stream.of(Main.class.getDeclaredFields()).filter(field -> field.isAnnotationPresent(InjectRunner.class)).findFirst().orElse(null);
-        if (runnerField != null) {
-            runnerField.setAccessible(true);
-            Constructor constructor = runnerField.getAnnotation(InjectRunner.class).runnerType().type().getDeclaredConstructor();
-            Constructor exporterConstructor = runnerField.getAnnotation(InjectRunner.class).exporterType().type().getDeclaredConstructor();
-            constructor.setAccessible(true);
-            exporterConstructor.setAccessible(true);
+    public void configureRunner() throws RuntimeException {
+        Stream.of(Main.class.getDeclaredFields()).filter(field -> field.isAnnotationPresent(InjectRunner.class)).forEach(runnerField -> {
+            try {
+                runnerField.setAccessible(true);
+                Constructor constructor = runnerField.getAnnotation(InjectRunner.class).runnerType().type().getDeclaredConstructor();
+                Constructor exporterConstructor = runnerField.getAnnotation(InjectRunner.class).exporterType().type().getDeclaredConstructor();
+                constructor.setAccessible(true);
+                exporterConstructor.setAccessible(true);
 
-            RuleRunner runner = (RuleRunner) constructor.newInstance();
-            Exporter exporter = (Exporter) exporterConstructor.newInstance();
+                RuleRunner runner = (RuleRunner) constructor.newInstance();
+                Exporter exporter = (Exporter) exporterConstructor.newInstance();
 
-            runner.setExporter(exporter);
-            runner.setRules(loadAllRules());
+                runner.setExporter(exporter);
+                runner.setRules(loadAllRules());
 
-            runnerField.set(null, runner);
-        }
+                runnerField.set(null, runner);
+            } catch (Exception error) {
+                throw new RuntimeException(error);
+            }
+        });
     }
 
     private void setUpReflections() {

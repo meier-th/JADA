@@ -3,6 +3,8 @@ package org.meier.check.rule;
 import com.github.javaparser.utils.Pair;
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
+import org.meier.check.rule.visitor.ReturnFieldVisitor;
+import org.meier.check.rule.visitor.SetFieldVisitor;
 import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
@@ -70,7 +72,7 @@ public class SingleResponsibilityRule implements CheckRule {
     private List<Set<MethodMeta>> getPurposeGroups(ClassMeta meta) {
         List<FieldMeta> fields = meta.getFields();
         List<Set<MethodMeta>> methodGroups = new ArrayList<>();
-        List<MethodMeta> methods = meta.getMethods().stream().filter(method -> !method.isStatic() && !isGetterOrSetter(method, meta)).collect(Collectors.toList());
+        List<MethodMeta> methods = meta.getMethods().stream().filter(method -> !method.isStatic() && !isGetterOrSetter(method)).collect(Collectors.toList());
         if (!methods.isEmpty()) {
             List<Pair<MethodMeta, Set<FieldMeta>>> thisClassUsedFields = new ArrayList<>();
             methods.forEach(method -> thisClassUsedFields.add(new Pair<>(method,
@@ -115,9 +117,40 @@ public class SingleResponsibilityRule implements CheckRule {
         return methodGroups;
     }
 
-    private boolean isGetterOrSetter(MethodMeta method, ClassMeta cls) {
-        return (method.getShortName().startsWith("get") || method.getShortName().startsWith("set"))
-                && cls.getFields().stream().anyMatch(field -> field.getName().equalsIgnoreCase(method.getShortName().substring(3)));
+    private boolean isGetter(MethodMeta method) {
+        if (!method.getParameters().isEmpty())
+            return false;
+        if (!method.getShortName().startsWith("get"))
+            return false;
+        Optional<FieldMeta> field = method.getOwnerClass().getFields().stream().filter(fld ->
+            fld.getFullClassName().equals(method.getFullQualifiedReturnType()) &&
+                    fld.getName().equalsIgnoreCase(method.getShortName().substring(3))
+        ).findAny();
+        if (field.isEmpty())
+            return false;
+        Boolean returnsField = method.getContent().accept(new ReturnFieldVisitor(), field.get());
+        return returnsField != null && returnsField;
+    }
+
+    private boolean isSetter(MethodMeta method) {
+        if (!(method.getParameters().size() == 1))
+            return false;
+        if (!method.getFullQualifiedReturnType().equals("void") ||
+                method.getFullQualifiedReturnType().equals("java.lang.Void") ||
+                method.getFullQualifiedReturnType().equals(method.getOwnerClass().getFullName()))
+            return false;
+        Optional<FieldMeta> field = method.getOwnerClass().getFields().stream().filter(fld ->
+            fld.getFullClassName().equals(method.getParameters().get(0).getTypeName()) &&
+                    fld.getName().equalsIgnoreCase(method.getShortName().substring(3))
+        ).findAny();
+        if (field.isEmpty())
+            return false;
+        Boolean setsField = method.getContent().accept(new SetFieldVisitor(), field.get());
+        return setsField != null && setsField;
+    }
+
+    private boolean isGetterOrSetter(MethodMeta method) {
+        return isGetter(method) || isSetter(method);
     }
 
 }
