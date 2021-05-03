@@ -3,6 +3,7 @@ package org.meier.check.rule;
 import org.meier.bean.NameTypeBean;
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
+import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.CodeBlockMeta;
 import org.meier.model.FieldMeta;
@@ -10,7 +11,8 @@ import org.meier.model.MethodMeta;
 
 import java.util.*;
 
-public class NonDescriptiveNamesRule implements Rule {
+@Rule
+public class NonDescriptiveNamesRule implements CheckRule {
 
     private final Set<String> shortDescriptiveNames = Set.of("me", "id", "no", "or");
 

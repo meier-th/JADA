@@ -6,6 +6,7 @@ import org.meier.check.rule.util.ClassMetaInfo;
 import org.meier.check.rule.util.TypeInfo;
 import org.meier.check.rule.visitor.IfSwitchVisitor;
 import org.meier.check.rule.visitor.ObjectCreationVisitor;
+import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.MetaHolder;
 import org.meier.model.MethodMeta;
@@ -14,7 +15,8 @@ import org.meier.model.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FactoryMethodRule implements Rule {
+@Rule
+public class FactoryMethodRule implements CheckRule {
 
     @Override
     public RuleResult executeRule(Collection<ClassMeta> classes) {

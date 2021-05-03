@@ -1,24 +1,24 @@
-package org.meier.check;
+package org.meier.check.runner;
 
+import org.meier.check.RuleRunner;
 import org.meier.check.bean.AnalysisResult;
-import org.meier.check.rule.Rule;
+import org.meier.check.rule.CheckRule;
 import org.meier.export.Exporter;
 import org.meier.model.ClassMeta;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FullReportUnorderedRuleRunner implements UnorderedRuleRunner {
+public class FullReportUnorderedRuleRunner implements RuleRunner {
 
-    private final List<Rule> rules = new LinkedList<>();
+    private List<CheckRule> rules;
     private Exporter exporter;
     private Collection<ClassMeta> classes;
 
     @Override
-    public void addRule(Rule rule) {
-        rules.add(rule);
+    public void setRules(List<CheckRule> rules) {
+        this.rules = rules;
     }
 
     @Override

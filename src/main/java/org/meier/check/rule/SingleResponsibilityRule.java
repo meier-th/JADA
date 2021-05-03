@@ -3,6 +3,7 @@ package org.meier.check.rule;
 import com.github.javaparser.utils.Pair;
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
+import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
 import org.meier.model.Meta;
@@ -11,7 +12,8 @@ import org.meier.model.MethodMeta;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SingleResponsibilityRule implements Rule {
+@Rule
+public class SingleResponsibilityRule implements CheckRule {
 
     private final double GROUP_SEPARATOR_THRESHOLD = 0.3;
 

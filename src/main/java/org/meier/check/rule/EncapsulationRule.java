@@ -2,6 +2,7 @@ package org.meier.check.rule;
 
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
+import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
 import org.meier.model.MethodMeta;
@@ -12,7 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EncapsulationRule implements Rule {
+@Rule
+public class EncapsulationRule implements CheckRule {
 
     @Override
     public RuleResult executeRule(Collection<ClassMeta> classes) {

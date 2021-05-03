@@ -5,6 +5,7 @@ import org.meier.check.bean.RuleResult;
 import org.meier.check.rule.visitor.CreateIfNullVisitor;
 import org.meier.check.rule.visitor.ObjectCreationVisitor;
 import org.meier.check.rule.visitor.SynchronisedBlockVisitor;
+import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
 import org.meier.model.MethodMeta;
@@ -15,7 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class SingletonRule implements Rule {
+@Rule
+public class SingletonRule implements CheckRule {
 
     private final Predicate<FieldMeta> isInstance = field -> field.isStatic() && field.getFullClassName().equals(field.getOwnerClass().getFullName());
     private final Predicate<MethodMeta> isInstanceMethod = meth -> meth.isStatic() && meth.getFullQualifiedReturnType().equals(meth.getOwnerClass().getFullName());

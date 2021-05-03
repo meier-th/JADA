@@ -3,6 +3,7 @@ package org.meier.check.rule;
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
 import org.meier.check.rule.util.ClassMetaInfo;
+import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.MetaHolder;
 import org.meier.model.MethodMeta;
@@ -10,7 +11,8 @@ import org.meier.model.MethodMeta;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class VisitorRule implements Rule {
+@Rule
+public class VisitorRule implements CheckRule {
 
     private final static int COMPLEXITY_FIELDS_NUM_THRESHOLD = 5;
     private final Map<ClassMeta, List<ClassMeta>> visitorsPerClass = new HashMap<>();

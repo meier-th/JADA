@@ -1,10 +1,8 @@
 package org.meier;
 
-import org.meier.check.FullReportUnorderedRuleRunner;
-import org.meier.check.UnorderedRuleRunner;
-import org.meier.check.rule.*;
-import org.meier.export.CliExporter;
-import org.meier.export.Exporter;
+import org.meier.check.RuleRunner;
+import org.meier.inject.Application;
+import org.meier.inject.annotation.InjectRunner;
 import org.meier.loader.FSProjectLoader;
 import org.meier.model.ClassMeta;
 import org.meier.model.MetaHolder;
@@ -14,27 +12,24 @@ import java.util.Collection;
 
 public class Main {
 
+    @InjectRunner
+    private static RuleRunner runner;
+
     public static void main(String[] args) {
-        try {
-            FSProjectLoader loader = new FSProjectLoader();
-            loader.loadProject("/home/thom/IdeaProjects/communicator/src/main/java",
-                    "/home/thom/.gradle/caches/modules-2/files-2.1");
-            Exporter cliExporter = new CliExporter();
-            UnorderedRuleRunner runner = new FullReportUnorderedRuleRunner();
-            Collection<ClassMeta> classes = MetaHolder.getClasses().values();
-            runner.setData(MetaHolder.getClasses().values());
-            runner.setExporter(cliExporter);
-            runner.addRule(new NonDescriptiveNamesRule());
-            runner.addRule(new SingleResponsibilityRule());
-            runner.addRule(new DependencyInversionRule());
-            runner.addRule(new EncapsulationRule());
-            runner.addRule(new FactoryMethodRule());
-            runner.addRule(new SingletonRule());
-            runner.addRule(new DecoratorRule());
-            runner.addRule(new VisitorRule());
-            runner.executeRules();
-        } catch (IOException error) {
-            System.out.println(error.getMessage());
+        if (args.length < 2) {
+            System.out.println("Provide project src directory and dependencies jar directory");
+            System.out.println("Format: java -jar jarname.jar project_source jar_source");
+        } else {
+            try {
+                Application.run();
+                FSProjectLoader loader = new FSProjectLoader();
+                loader.loadProject(args[0], args[1]);
+                Collection<ClassMeta> classes = MetaHolder.getClasses().values();
+                runner.setData(classes);
+                runner.executeRules();
+            } catch (IOException error) {
+                System.out.println(error.getMessage());
+            }
         }
     }
 

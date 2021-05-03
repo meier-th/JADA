@@ -4,6 +4,7 @@ import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
 import org.meier.check.rule.util.ClassMetaInfo;
 import org.meier.check.rule.util.TypeInfo;
+import org.meier.inject.annotation.Rule;
 import org.meier.model.*;
 
 import java.util.ArrayList;
@@ -11,7 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DecoratorRule implements Rule {
+@Rule
+public class DecoratorRule implements CheckRule {
 
     private final static double DECORATOR_RATIO_THRESHOLD = 0.6;
 

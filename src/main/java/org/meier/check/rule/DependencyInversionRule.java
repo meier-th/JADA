@@ -2,6 +2,7 @@ package org.meier.check.rule;
 
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
+import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
 import org.meier.model.MetaHolder;
@@ -12,7 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public class DependencyInversionRule implements Rule {
+@Rule
+public class DependencyInversionRule implements CheckRule {
 
     @Override
     public RuleResult executeRule(Collection<ClassMeta> classes) {
