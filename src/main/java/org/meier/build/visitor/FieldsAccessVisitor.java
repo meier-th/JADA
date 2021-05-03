@@ -26,7 +26,6 @@ public class FieldsAccessVisitor extends GenericListVisitorAdapter<FieldMeta, Vo
             }
             return Collections.emptyList();
         } catch (UnsolvedSymbolException error) {
-            // some logs
             return Collections.emptyList();
         }
     }

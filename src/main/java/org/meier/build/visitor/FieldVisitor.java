@@ -30,7 +30,6 @@ public class FieldVisitor extends VoidVisitorAdapter<ClassMeta> {
                     })
                     .collect(Collectors.toList()));
         } catch (Exception error) {
-            // some log
         }
     }
 }

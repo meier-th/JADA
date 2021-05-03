@@ -5,6 +5,7 @@ import org.meier.check.bean.RuleResult;
 import org.meier.check.rule.visitor.CreateIfNullVisitor;
 import org.meier.check.rule.visitor.ObjectCreationVisitor;
 import org.meier.check.rule.visitor.SynchronisedBlockVisitor;
+import org.meier.check.rule.visitor.SynchronisedInitializationVisitor;
 import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
@@ -76,7 +77,7 @@ public class SingletonRule implements CheckRule {
         if (instanceMethod.getCalledMethods().stream().map(MethodMeta::getOwnerClass).anyMatch(clazz -> clazz.getFullName().startsWith("java.util.concurrent.")) &&
             createsIfNull != null && createsIfNull)
             return true;
-        Boolean threadSafe = instanceMethod.getContent().accept(new SynchronisedBlockVisitor(), getInstanceField(cls));
+        Boolean threadSafe = instanceMethod.getContent().accept(new SynchronisedInitializationVisitor(), getInstanceField(cls));
         return threadSafe != null && threadSafe;
     }
 

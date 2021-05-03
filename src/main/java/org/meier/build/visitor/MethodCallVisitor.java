@@ -17,7 +17,6 @@ public class MethodCallVisitor extends GenericListVisitorAdapter<CalledMethodBea
         try {
             return List.of(resolveMethod(n.getScope().orElse(null), n.resolve()));
         } catch (Exception error) {
-            // somelogs
             return Collections.emptyList();
         }
     }
