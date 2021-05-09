@@ -24,6 +24,7 @@ public class VisitorRule implements CheckRule {
                 .filter(cls -> cls.getProjectImplementedInterfaces().isEmpty() && cls.getProjectExtendedClasses().isEmpty())
                 .forEach(cls -> {
                     Set<ClassMeta> descendants = new HashSet<>(ClassMetaInfo.getAllDescendants(cls));
+                    descendants.add(cls);
                     Map<ClassMeta, List<ClassMeta>> visitors = new HashMap<>();
                     descendants.forEach(visited ->
                             visitedBy(visited).forEach(visitor -> {
@@ -94,7 +95,7 @@ public class VisitorRule implements CheckRule {
         if (visitorsPerClass.containsKey(cls))
             return false;
         try {
-            String clsName = cls.getFullName().substring(cls.getFullName().lastIndexOf("."));
+            String clsName = cls.getFullName();
             return cls.getFields().stream().anyMatch(field -> field.getFullClassName().endsWith("List<" + clsName + ">") ||
                     field.getFullClassName().endsWith("Set<" + clsName + ">") ||
                     field.getFullClassName().matches("\\w*Map<\\w+" + clsName + ">")) && cls.getFields().size() > COMPLEXITY_FIELDS_NUM_THRESHOLD;

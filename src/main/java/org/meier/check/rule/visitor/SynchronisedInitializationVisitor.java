@@ -9,7 +9,14 @@ public class SynchronisedInitializationVisitor extends GenericVisitorAdapter<Boo
 
     @Override
     public Boolean visit(IfStmt n, FieldMeta arg) {
-        return ClassMetaInfo.isNullComparison(n, arg) && n.getThenStmt().accept(new SynchronisedBlockVisitor(), arg) ||
-                ClassMetaInfo.isNotNullComparison(n, arg) && n.getElseStmt().isPresent() && n.getElseStmt().get().accept(new SynchronisedBlockVisitor(), arg);
+            if (ClassMetaInfo.isNullComparison(n, arg)) {
+                Boolean synchBlockVisitorResult = n.getThenStmt().accept(new SynchronisedBlockVisitor(), arg);
+                return synchBlockVisitorResult != null && synchBlockVisitorResult;
+            }
+            if (ClassMetaInfo.isNotNullComparison(n, arg) && n.getElseStmt().isPresent()) {
+                Boolean synchBlockVisitorResult = n.getElseStmt().get().accept(new SynchronisedBlockVisitor(), arg);
+                return synchBlockVisitorResult != null && synchBlockVisitorResult;
+            }
+            return false;
     }
 }
