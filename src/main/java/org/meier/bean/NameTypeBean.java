@@ -8,6 +8,7 @@ public class NameTypeBean {
     private final String fullClassName;
     private final String className;
     private ResolvedType type;
+    private boolean isLoopVariable = false;
 
     public NameTypeBean(String name, String fullClassName, String className) {
         this.name = name;
@@ -20,6 +21,14 @@ public class NameTypeBean {
         this.fullClassName = fullClassName;
         this.className = className;
         this.type = type;
+    }
+
+    public boolean isLoopVariable() {
+        return this.isLoopVariable;
+    }
+
+    public void setLoopVariable(boolean loopVariable) {
+        this.isLoopVariable = loopVariable;
     }
 
     public void setType(ResolvedType type) {

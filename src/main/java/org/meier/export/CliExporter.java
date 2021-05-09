@@ -28,5 +28,12 @@ public class CliExporter implements Exporter {
             }
             System.out.print("\n\n\n");
         });
+        printTotal(result);
     }
+
+    private void printTotal(AnalysisResult result) {
+        System.out.println("Total defects found:");
+        result.getResults().forEach(res -> System.out.println(res.getRuleName()+"\t:\t"+res.getFoundDefects().size()));
+    }
+
 }

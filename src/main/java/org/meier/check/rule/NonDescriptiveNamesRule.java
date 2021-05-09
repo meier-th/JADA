@@ -14,7 +14,7 @@ import java.util.*;
 @Rule
 public class NonDescriptiveNamesRule implements CheckRule {
 
-    private final Set<String> shortDescriptiveNames = Set.of("me", "id", "no", "or");
+    private final Set<String> shortDescriptiveNames = Set.of("me", "id", "no", "or", "f", "is", "cl", "i");
 
     @Override
     public RuleResult executeRule(Collection<ClassMeta> classes) {
@@ -34,7 +34,7 @@ public class NonDescriptiveNamesRule implements CheckRule {
                             .setLineNumber(meth.getStartLine()));
                 }
                 for (NameTypeBean variable : meth.getVariables()) {
-                    if (isNonDescriptive(variable.getName())) {
+                    if (!variable.isLoopVariable() && isNonDescriptive(variable.getName())) {
                         defects.add(DefectCase.newInstance()
                                 .setDefectName("Non-descriptive variable name")
                                 .setClassName(cls.getFullName())
@@ -55,13 +55,15 @@ public class NonDescriptiveNamesRule implements CheckRule {
             }
             for (CodeBlockMeta block : initializerBlocks) {
                 for (NameTypeBean variable : block.getVariables()) {
-                    String name = variable.getName();
-                    if (isNonDescriptive(name)) {
-                        defects.add(DefectCase.newInstance()
-                            .setDefectName("Non-descriptive variable name")
-                            .setClassName(cls.getFullName())
-                            .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", name))
-                            .setLineNumber(block.getStartLine()));
+                    if (!variable.isLoopVariable()) {
+                        String name = variable.getName();
+                        if (isNonDescriptive(name)) {
+                            defects.add(DefectCase.newInstance()
+                                    .setDefectName("Non-descriptive variable name")
+                                    .setClassName(cls.getFullName())
+                                    .setDefectDescription(String.format("\"%s\" is probably not descriptive enough", name))
+                                    .setLineNumber(block.getStartLine()));
+                        }
                     }
                 }
             }
