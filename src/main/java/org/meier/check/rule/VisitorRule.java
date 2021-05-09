@@ -93,10 +93,14 @@ public class VisitorRule implements CheckRule {
     private boolean isClassTreeLikeAndComplexAndNotVisited(ClassMeta cls) {
         if (visitorsPerClass.containsKey(cls))
             return false;
-        String clsName = cls.getFullName().substring(cls.getFullName().lastIndexOf("."));
-        return cls.getFields().stream().anyMatch(field -> field.getFullClassName().endsWith("List<"+clsName+">") ||
-                    field.getFullClassName().endsWith("Set<"+clsName+">") ||
-                    field.getFullClassName().matches("\\w*Map<\\w+"+clsName+">")) && cls.getFields().size() > COMPLEXITY_FIELDS_NUM_THRESHOLD;
+        try {
+            String clsName = cls.getFullName().substring(cls.getFullName().lastIndexOf("."));
+            return cls.getFields().stream().anyMatch(field -> field.getFullClassName().endsWith("List<" + clsName + ">") ||
+                    field.getFullClassName().endsWith("Set<" + clsName + ">") ||
+                    field.getFullClassName().matches("\\w*Map<\\w+" + clsName + ">")) && cls.getFields().size() > COMPLEXITY_FIELDS_NUM_THRESHOLD;
+        } catch (NullPointerException error) {
+            return false;
+        }
     }
 
 }

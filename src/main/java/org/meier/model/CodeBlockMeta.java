@@ -5,6 +5,7 @@ import org.meier.bean.CalledMethodBean;
 import org.meier.bean.NameTypeBean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -81,7 +82,7 @@ public class CodeBlockMeta implements Meta, CodeContainer {
 
     @Override
     public List<NameTypeBean> getVariables() {
-        return variables;
+        return variables == null ? Collections.emptyList() : variables;
     }
 
     public CodeBlockMeta setVariables(List<NameTypeBean> variables) {

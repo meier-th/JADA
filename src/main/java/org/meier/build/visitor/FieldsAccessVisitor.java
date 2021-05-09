@@ -25,7 +25,7 @@ public class FieldsAccessVisitor extends GenericListVisitorAdapter<FieldMeta, Vo
                 return owner.getFields().stream().filter(field -> field.getName().equals(fieldName)).collect(Collectors.toList());
             }
             return Collections.emptyList();
-        } catch (UnsolvedSymbolException error) {
+        } catch (UnsolvedSymbolException | UnsupportedOperationException error) {
             return Collections.emptyList();
         }
     }

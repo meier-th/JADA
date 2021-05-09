@@ -23,7 +23,11 @@ public class MethodCallVisitor extends GenericListVisitorAdapter<CalledMethodBea
 
     @Override
     public List<CalledMethodBean> visit(MethodReferenceExpr n, Void arg) {
-        return List.of(resolveMethod(n.getScope(), n.resolve()));
+        try {
+            return List.of(resolveMethod(n.getScope(), n.resolve()));
+        } catch(Exception error) {
+            return Collections.emptyList();
+        }
     }
 
     private CalledMethodBean resolveMethod(Expression scope, ResolvedMethodDeclaration method) {

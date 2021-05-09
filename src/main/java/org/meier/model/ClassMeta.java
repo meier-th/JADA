@@ -20,14 +20,16 @@ public class ClassMeta implements Meta {
     private final List<CodeBlockMeta> codeBlocks = new ArrayList<>();
     private int startLine;
     private List<ConstructorMeta> constructors = new ArrayList<>();
+    private final boolean isInterface;
 
-    public ClassMeta(String fullName, List<Modifier> modifiers) {
+    public ClassMeta(String fullName, List<Modifier> modifiers, boolean isInterface) {
         this.fullName = fullName;
         this.modifiers.addAll(modifiers);
+        this.isInterface = isInterface;
     }
 
-    public ClassMeta(String fullName, List<Modifier> modifiers, boolean nested) {
-        this(fullName, modifiers);
+    public ClassMeta(String fullName, List<Modifier> modifiers, boolean nested, boolean isInterface) {
+        this(fullName, modifiers, isInterface);
         this.nested = nested;
     }
 
@@ -35,6 +37,10 @@ public class ClassMeta implements Meta {
         this.methods.forEach(MethodMeta::resolveCalledMethods);
         this.codeBlocks.forEach(CodeBlockMeta::resolveCalledMethods);
         this.getInnerClasses().forEach(ClassMeta::resolveMethodCalls);
+    }
+
+    public boolean isInterface() {
+        return isInterface;
     }
 
     public void addExtendedBy(ClassMeta cls) {

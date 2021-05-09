@@ -22,8 +22,9 @@ public class MethodMeta implements Meta, CodeContainer {
     private List<NameTypeBean> variables;
     private final Set<ClassMeta> calledBy = new HashSet<>();
     private final Type returnType;
+    private final boolean overrideAnnotationPresent;
 
-    public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<Parameter> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass, Type returnType) {
+    public MethodMeta(MethodDeclaration content, String name, Set<Modifier> modifiers, List<Parameter> parameters, List<FieldMeta> accessedFields, List<CalledMethodBean> calledMethods, String fullQualifiedReturnType, ClassMeta ownerClass, Type returnType, boolean overrideAnnotationPresent) {
         this.name = name;
         this.modifiers = modifiers;
         this.parameters = parameters;
@@ -33,6 +34,7 @@ public class MethodMeta implements Meta, CodeContainer {
         this.ownerClass = ownerClass;
         this.content = content;
         this.returnType = returnType;
+        this.overrideAnnotationPresent = overrideAnnotationPresent;
     }
 
     public void resolveCalledMethods() {
@@ -70,11 +72,19 @@ public class MethodMeta implements Meta, CodeContainer {
         return variables == null ? Collections.emptyList() : variables;
     }
 
+    public boolean isOverrideAnnotationPresent() {
+        return this.overrideAnnotationPresent;
+    }
+
     @Override
     public void addVariable(NameTypeBean variable) {
         if (variables == null)
             variables = new ArrayList<>();
         variables.add(variable);
+    }
+
+    public boolean isAbstract() {
+        return this.modifiers.contains(Modifier.ABSTRACT) || this.ownerClass.isInterface();
     }
 
     public void setVariables(List<NameTypeBean> vars) {

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Rule
 public class SingleResponsibilityRule implements CheckRule {
 
-    private final double GROUP_SEPARATOR_THRESHOLD = 0.3;
+    private final double GROUP_SEPARATOR_THRESHOLD = 0.2;
 
     @Override
     public RuleResult executeRule(Collection<ClassMeta> classes) {
@@ -72,7 +72,9 @@ public class SingleResponsibilityRule implements CheckRule {
     private List<Set<MethodMeta>> getPurposeGroups(ClassMeta meta) {
         List<FieldMeta> fields = meta.getFields();
         List<Set<MethodMeta>> methodGroups = new ArrayList<>();
-        List<MethodMeta> methods = meta.getMethods().stream().filter(method -> !method.isStatic() && !isGetterOrSetter(method)).collect(Collectors.toList());
+        List<MethodMeta> methods = meta.getMethods().stream().filter(method -> !method.isOverrideAnnotationPresent() &&
+                !method.isStatic() &&
+                !isGetterOrSetter(method)).collect(Collectors.toList());
         if (!methods.isEmpty()) {
             List<Pair<MethodMeta, Set<FieldMeta>>> thisClassUsedFields = new ArrayList<>();
             methods.forEach(method -> thisClassUsedFields.add(new Pair<>(method,
@@ -91,6 +93,7 @@ public class SingleResponsibilityRule implements CheckRule {
                 }
             }
             Stack<MethodMeta> methodGroup = new Stack<>();
+            Set<MethodMeta> processedMethods = new HashSet<>();
 
             while (!methods.isEmpty()) {
                 methodGroup.push(methods.get(0));
@@ -98,14 +101,15 @@ public class SingleResponsibilityRule implements CheckRule {
                 int finalLargestCommonFieldsValue = largestCommonFieldsValue;
                 while (!methodGroup.empty()) {
                     MethodMeta method = methodGroup.pop();
+                    processedMethods.add(method);
                     methods.remove(method);
                     methodGroupSet.add(method);
 
                     if (commonAccessedFields.get(method) != null) {
                         commonAccessedFields.get(method).forEach((key, value) -> {
-                            if (value >= finalLargestCommonFieldsValue * GROUP_SEPARATOR_THRESHOLD ||
+                            if (!processedMethods.contains(key) && (value >= finalLargestCommonFieldsValue * GROUP_SEPARATOR_THRESHOLD ||
                                 method.getCalledMethods().contains(key) ||
-                                key.getCalledMethods().contains(method)) {
+                                key.getCalledMethods().contains(method))) {
                                 methodGroup.push(key);
                             }
                         });
@@ -120,11 +124,11 @@ public class SingleResponsibilityRule implements CheckRule {
     private boolean isGetter(MethodMeta method) {
         if (!method.getParameters().isEmpty())
             return false;
-        if (!method.getShortName().startsWith("get"))
+        if (!method.getShortName().startsWith("get") && !method.getShortName().startsWith("is"))
             return false;
         Optional<FieldMeta> field = method.getOwnerClass().getFields().stream().filter(fld ->
             fld.getFullClassName().equals(method.getFullQualifiedReturnType()) &&
-                    fld.getName().equalsIgnoreCase(method.getShortName().substring(3))
+                    fld.getName().endsWith(method.getShortName().substring(3))
         ).findAny();
         if (field.isEmpty())
             return false;

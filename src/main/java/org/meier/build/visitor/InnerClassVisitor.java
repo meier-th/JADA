@@ -43,9 +43,13 @@ public class InnerClassVisitor extends VoidVisitorAdapter<ClassMeta> {
         ClassMeta clazz = cls;
         if (n.isNestedType() || n.isLocalClassDeclaration()) {
             List<Modifier> modifiersList = n.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
-            clazz = new ClassMeta(n.resolve().asReferenceType().getQualifiedName(), modifiersList, true);
-            clazz.setExtendedClasses(n.getExtendedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
-            clazz.setImplementedInterfaces(n.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+            clazz = new ClassMeta(n.resolve().asReferenceType().getQualifiedName(), modifiersList, n.isInterface(), true);
+            try {
+                clazz.setExtendedClasses(n.getExtendedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+                clazz.setImplementedInterfaces(n.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+            } catch (NullPointerException error) {
+                System.out.println(error);
+            }
             MetaHolder.addClass(clazz);
             clazz.setStartLine(n.getBegin().get().line);
             n.accept(new FieldVisitor(), clazz);

@@ -27,7 +27,11 @@ public class TypeResolver {
     }
 
     public static String getQualifiedName(Type type) {
-        return getQualifiedNameFromResolved(type, type.resolve());
+        try {
+            return getQualifiedNameFromResolved(type, type.resolve());
+        } catch (Exception error) {
+            return "java.lang.Object";
+        }
     }
 
     private static String getQualifiedNameFromResolved(Type type, ResolvedType resType) {

@@ -8,6 +8,6 @@ public class SetFieldVisitor extends GenericVisitorAdapter<Boolean, FieldMeta> {
 
     @Override
     public Boolean visit(AssignExpr n, FieldMeta arg) {
-        return n.getTarget().asFieldAccessExpr().getName().toString().equals(arg.getName());
+        return n.getTarget().isFieldAccessExpr() && n.getTarget().asFieldAccessExpr().getName().toString().equals(arg.getName());
     }
 }

@@ -48,15 +48,6 @@ public class FSProjectLoader implements ProjectLoader {
     }
 
     @Override
-    public ClassMeta loadFile(String filePath, String projectPath, String jarsDir) throws IOException {
-            init(Paths.get(projectPath), Paths.get(jarsDir));
-            CompilationUnit headNode = StaticJavaParser.parse(Paths.get(filePath));
-            List<Modifier> modifiersList = headNode.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
-            return new ClassMeta(headNode.accept(new ClassNameVisitor(), null), modifiersList);
-    }
-
-
-    @Override
     public void loadProject(String dirPath, String jarsDir) throws IOException {
         Path path = Paths.get(dirPath);
 
@@ -78,25 +69,32 @@ public class FSProjectLoader implements ProjectLoader {
                 .collect(Collectors.toList());
 
         LinkedHashMap<CompilationUnit, ClassMeta> classMetaForCUs = new LinkedHashMap<>();
-        cus.forEach(cu ->  {
-            String clsName = cu.accept(new ClassNameVisitor(), null);
-            List<Modifier> modifiersList = cu.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
-            ClassMeta cls = new ClassMeta(clsName, modifiersList);
-            cls.setStartLine(cu.getBegin().get().line);
-            ClassOrInterfaceDeclaration clIntDecl = (ClassOrInterfaceDeclaration)cu.getChildNodes().stream().filter(node -> node instanceof ClassOrInterfaceDeclaration).findFirst().orElse(null);
-            EnumDeclaration enumDecl = (EnumDeclaration)cu.getChildNodes().stream().filter(node -> node instanceof EnumDeclaration).findFirst().orElse(null);
-            if (clIntDecl != null) {
-                cls.setExtendedClasses(clIntDecl.getExtendedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
-                cls.setImplementedInterfaces(clIntDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
-            } else if (enumDecl != null) {
-                cls.setImplementedInterfaces(enumDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+        cus.forEach(cu -> {
+            boolean[] isInterface = new boolean[1];
+            String clsName = cu.accept(new ClassNameVisitor(), isInterface);
+            if (clsName != null) {
+                List<Modifier> modifiersList = cu.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CLASS);
+                ClassMeta cls = new ClassMeta(clsName, modifiersList, isInterface[0]);
+                cls.setStartLine(cu.getBegin().get().line);
+                ClassOrInterfaceDeclaration clIntDecl = (ClassOrInterfaceDeclaration) cu.getChildNodes().stream().filter(node -> node instanceof ClassOrInterfaceDeclaration).findFirst().orElse(null);
+                EnumDeclaration enumDecl = (EnumDeclaration) cu.getChildNodes().stream().filter(node -> node instanceof EnumDeclaration).findFirst().orElse(null);
+                if (clIntDecl != null) {
+                    try {
+                        cls.setExtendedClasses(clIntDecl.getExtendedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+                        cls.setImplementedInterfaces(clIntDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+                    } catch (Exception error) {
+                        System.out.println(error);
+                    }
+                } else if (enumDecl != null) {
+                    cls.setImplementedInterfaces(enumDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
+                }
+                cu.accept(new InitializerBlocksVisitor(), cls);
+                MetaHolder.addClass(cls);
+                cu.accept(new FieldVisitor(), cls);
+                cu.accept(new ConstructorVisitor(), cls);
+                cu.accept(new InnerClassVisitor(), cls);
+                classMetaForCUs.put(cu, cls);
             }
-            cu.accept(new InitializerBlocksVisitor(), cls);
-            MetaHolder.addClass(cls);
-            cu.accept(new FieldVisitor(), cls);
-            cu.accept(new ConstructorVisitor(), cls);
-            cu.accept(new InnerClassVisitor(), cls);
-            classMetaForCUs.put(cu, cls);
         });
         classMetaForCUs.forEach((cu, cls) -> cu.accept(new MethodVisitor(), cls));
         InnerClassVisitor.runInnerClassesMethodVisitors();

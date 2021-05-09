@@ -4,7 +4,6 @@ import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
 import org.meier.check.rule.visitor.CreateIfNullVisitor;
 import org.meier.check.rule.visitor.ObjectCreationVisitor;
-import org.meier.check.rule.visitor.SynchronisedBlockVisitor;
 import org.meier.check.rule.visitor.SynchronisedInitializationVisitor;
 import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;

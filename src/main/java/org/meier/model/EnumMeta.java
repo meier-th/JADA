@@ -8,7 +8,7 @@ public class EnumMeta extends ClassMeta {
     private final List<EnumConstantMeta> enumConstants = new ArrayList<>();
 
     public EnumMeta(String fullName, List<Modifier> modifiers) {
-        super(fullName, modifiers);
+        super(fullName, modifiers, false);
     }
 
     public EnumMeta(String fullName, List<Modifier> modifiers, boolean nested) {
