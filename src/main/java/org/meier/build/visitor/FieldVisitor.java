@@ -21,15 +21,14 @@ public class FieldVisitor extends VoidVisitorAdapter<ClassMeta> {
             List<NameTypeBean> names = new ArrayList<>();
             fieldDecl.accept(new NameTypeVisitor(), names);
             Set<Modifier> modifiers = Set.copyOf(modifiersList);
-            classMeta.getFields().addAll(names.stream()
+            classMeta.setFields(names.stream()
                     .filter(name -> name.getClassName().equals(classMeta.getFullName()))
                     .map(nameTypeBean -> {
                         FieldMeta meta = new FieldMeta(nameTypeBean.getName(), nameTypeBean.getFullClassName(), modifiers, classMeta);
                         meta.setStartLine(fieldDecl.getBegin().get().line);
                         return meta;
                     })
-                    .collect(Collectors.toList()));
-        } catch (Exception error) {
-        }
+                    .collect(Collectors.toMap(FieldMeta::getName, fld -> fld)));
+        } catch (Exception ignored) {}
     }
 }

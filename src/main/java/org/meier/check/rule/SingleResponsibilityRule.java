@@ -4,8 +4,6 @@ import com.github.javaparser.utils.Pair;
 import org.meier.check.bean.DefectCase;
 import org.meier.check.bean.RuleResult;
 import org.meier.check.rule.util.ClassMetaInfo;
-import org.meier.check.rule.visitor.ReturnFieldVisitor;
-import org.meier.check.rule.visitor.SetFieldVisitor;
 import org.meier.inject.annotation.Rule;
 import org.meier.model.ClassMeta;
 import org.meier.model.FieldMeta;
@@ -71,7 +69,7 @@ public class SingleResponsibilityRule implements CheckRule {
     }
 
     private List<Set<MethodMeta>> getPurposeGroups(ClassMeta meta) {
-        List<FieldMeta> fields = meta.getFields();
+        Map<String, FieldMeta> fields = meta.getFields();
         List<Set<MethodMeta>> methodGroups = new ArrayList<>();
         List<MethodMeta> methods = meta.getMethods().stream().filter(method -> !method.isOverrideAnnotationPresent() &&
                 !method.isStatic() &&
@@ -79,7 +77,7 @@ public class SingleResponsibilityRule implements CheckRule {
         if (!methods.isEmpty()) {
             List<Pair<MethodMeta, Set<FieldMeta>>> thisClassUsedFields = new ArrayList<>();
             methods.forEach(method -> thisClassUsedFields.add(new Pair<>(method,
-                    method.getAccessedFields().stream().filter(fields::contains).collect(Collectors.toSet()))));
+                    method.getAccessedFields().stream().filter(fields::containsKey).collect(Collectors.toSet()))));
             Map<MethodMeta, Map<MethodMeta, Integer>> commonAccessedFields = new LinkedHashMap<>();
             int largestCommonFieldsValue = 0;
             for (int i = 0; i < thisClassUsedFields.size() - 1; ++i) {

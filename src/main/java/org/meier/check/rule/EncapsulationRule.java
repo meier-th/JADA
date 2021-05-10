@@ -36,7 +36,7 @@ public class EncapsulationRule implements CheckRule {
     }
 
     private List<FieldMeta> getVulnerableFields(ClassMeta cls) {
-        return cls.getFields().stream().filter(field -> field.accessModifier() != Modifier.PRIVATE && !field.getModifiers().contains(Modifier.FINAL)
+        return cls.getFields().values().stream().filter(field -> field.accessModifier() != Modifier.PRIVATE && !field.getModifiers().contains(Modifier.FINAL)
                 && !field.getFullClassName().equals("java.lang.String")).collect(Collectors.toList());
     }
 

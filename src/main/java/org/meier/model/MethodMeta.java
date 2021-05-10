@@ -16,7 +16,7 @@ public class MethodMeta implements Meta, CodeContainer {
     private final List<Parameter> parameters;
     private final List<FieldMeta> accessedFields;
     private List<MethodMeta> calledMethods;
-    private final List<CalledMethodBean> calledMethodsNames;
+    private List<CalledMethodBean> calledMethodsNames;
     private ClassMeta ownerClass;
     private final MethodDeclaration content;
     private List<NameTypeBean> variables;
@@ -38,20 +38,23 @@ public class MethodMeta implements Meta, CodeContainer {
     }
 
     public void resolveCalledMethods() {
-        calledMethods = calledMethodsNames.stream()
-                .map(meth -> {
-                    ClassMeta ownerClass = MetaHolder.getClass(meth.getClassName());
-                    if (ownerClass != null) {
-                        return ownerClass.getMethods()
-                                .stream()
-                                .filter(mt -> mt.getName().equals(meth.getFullMethodName()))
-                                .findFirst().orElse(null);
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        calledMethods.forEach(meth -> meth.addCalledBy(this.ownerClass));
+        if (calledMethodsNames != null) {
+            calledMethods = calledMethodsNames.stream()
+                    .map(meth -> {
+                        ClassMeta ownerClass = MetaHolder.getClass(meth.getClassName());
+                        if (ownerClass != null) {
+                            return ownerClass.getMethods()
+                                    .stream()
+                                    .filter(mt -> mt.getName().equals(meth.getFullMethodName()))
+                                    .findFirst().orElse(null);
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            calledMethods.forEach(meth -> meth.addCalledBy(this.ownerClass));
+            calledMethodsNames = null;
+        }
     }
 
     public void addCalledBy(ClassMeta cls) {
@@ -93,10 +96,6 @@ public class MethodMeta implements Meta, CodeContainer {
 
     public String getShortName() {
         return name.substring(name.lastIndexOf(".")+1);
-    }
-
-    public List<CalledMethodBean> getCalledMethodsNames() {
-        return calledMethodsNames;
     }
 
     public MethodDeclaration getContent() {

@@ -61,12 +61,10 @@ public final class ClassMetaInfo {
             return false;
         if (!method.getShortName().startsWith("get") && !method.getShortName().startsWith("is"))
             return false;
-        Optional<FieldMeta> field = method.getOwnerClass().getFields().stream().filter(fld ->
-                fld.getFullClassName().equals(method.getFullQualifiedReturnType()) &&
-                        fld.getName().endsWith(method.getShortName().substring(3))
-        ).findAny();
-        if (field.isEmpty())
-            return false;
+        Optional<FieldMeta> field = method.getOwnerClass().getFields().values().stream().filter(fld -> method.getShortName().substring(3).equalsIgnoreCase(fld.getName()) ||
+                method.getShortName().substring(2).equalsIgnoreCase(fld.getName())).findAny();
+        if (field.isEmpty() || !field.get().getFullClassName().equals(method.getFullQualifiedReturnType()))
+               return false;
         Boolean returnsField = method.getContent().accept(new ReturnFieldVisitor(), field.get());
         return returnsField != null && returnsField;
     }
@@ -78,11 +76,11 @@ public final class ClassMetaInfo {
                 method.getFullQualifiedReturnType().equals("java.lang.Void") ||
                 method.getFullQualifiedReturnType().equals(method.getOwnerClass().getFullName())))
             return false;
-        Optional<FieldMeta> field = method.getOwnerClass().getFields().stream().filter(fld ->
-                fld.getFullClassName().equals(method.getParameters().get(0).getTypeName()) &&
-                        fld.getName().equalsIgnoreCase(method.getShortName().substring(3))
-        ).findAny();
-        if (field.isEmpty())
+        if (method.getShortName().length() < 4)
+            return false;
+        Optional<FieldMeta> field = method.getOwnerClass().getFields().values().stream().filter(fld -> method.getShortName().substring(3).equalsIgnoreCase(fld.getName()))
+                .findAny();
+        if (field.isEmpty() || !field.get().getFullClassName().equals(method.getParameters().get(0).getTypeName()))
             return false;
         Boolean setsField = method.getContent().accept(new SetFieldVisitor(), field.get());
         return setsField != null && setsField;

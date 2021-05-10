@@ -47,7 +47,7 @@ public class SingletonRule implements CheckRule {
     private boolean isSingleton(ClassMeta cls) {
         if (!cls.getConstructors().stream().allMatch(constructor -> constructor.accessModifier() == Modifier.PRIVATE))
             return false;
-        return cls.getFields().stream().anyMatch(isInstance) && getInstanceMethod(cls) != null;
+        return cls.getFields().values().stream().anyMatch(isInstance) && getInstanceMethod(cls) != null;
     }
 
     private boolean isInstancePrivate(ClassMeta cls) {
@@ -58,7 +58,7 @@ public class SingletonRule implements CheckRule {
     }
 
     private FieldMeta getInstanceField(ClassMeta cls) {
-        return cls.getFields().stream().filter(isInstance).findAny().orElse(null);
+        return cls.getFields().values().stream().filter(isInstance).findAny().orElse(null);
     }
 
     private MethodMeta getInstanceMethod(ClassMeta cls) {

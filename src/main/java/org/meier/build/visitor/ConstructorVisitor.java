@@ -16,16 +16,17 @@ public class ConstructorVisitor extends VoidVisitorAdapter<ClassMeta> {
     @Override
     public void visit(ConstructorDeclaration n, ClassMeta classMeta) {
         List<Modifier> modifiersList = n.accept(new ModifierVisitor(), ModifierVisitor.ModifierLevel.CONSTRUCTOR);
+        try {
+            String fullName = n.resolve().getQualifiedName();
+            if (fullName.substring(0, fullName.lastIndexOf('.')).equals(classMeta.getFullName())) {
 
-        String fullName = n.resolve().getQualifiedName();
-        if (fullName.substring(0, fullName.lastIndexOf('.')).equals(classMeta.getFullName())) {
+                List<Parameter> parameters = n.getParameters().stream().map(param ->
+                        new Parameter(param.getNameAsString(), TypeResolver.getQualifiedName(param.getType()), n.getTypeParameters(), param.getType())
+                ).collect(Collectors.toList());
 
-            List<Parameter> parameters = n.getParameters().stream().map(param ->
-                    new Parameter(param.getNameAsString(), TypeResolver.getQualifiedName(param.getType()), n.getTypeParameters(), param.getType())
-            ).collect(Collectors.toList());
-
-            ConstructorMeta constructor = new ConstructorMeta(classMeta, modifiersList, parameters, n);
-            classMeta.addConstructor(constructor);
-        }
+                ConstructorMeta constructor = new ConstructorMeta(classMeta, modifiersList, parameters, n);
+                classMeta.addConstructor(constructor);
+            }
+        } catch (Exception ignored) {}
     }
 }

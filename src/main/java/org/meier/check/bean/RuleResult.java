@@ -6,7 +6,7 @@ import java.util.List;
 public class RuleResult {
 
     private final String ruleName;
-    private List<DefectCase> foundDefects;
+    private final List<DefectCase> foundDefects;
 
     public RuleResult(String ruleName, List<DefectCase> defects) {
         this.ruleName = ruleName;

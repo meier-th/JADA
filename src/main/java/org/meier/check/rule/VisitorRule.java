@@ -96,7 +96,7 @@ public class VisitorRule implements CheckRule {
             return false;
         try {
             String clsName = cls.getFullName();
-            return cls.getFields().stream().anyMatch(field -> field.getFullClassName().endsWith("List<" + clsName + ">") ||
+            return cls.getFields().values().stream().anyMatch(field -> field.getFullClassName().endsWith("List<" + clsName + ">") ||
                     field.getFullClassName().endsWith("Set<" + clsName + ">") ||
                     field.getFullClassName().matches("\\w*Map<\\w+" + clsName + ">")) && cls.getFields().size() > COMPLEXITY_FIELDS_NUM_THRESHOLD;
         } catch (NullPointerException error) {

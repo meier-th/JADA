@@ -32,7 +32,7 @@ public class DependencyInversionRule implements CheckRule {
 
     private List<ClassMeta> getUsedClasses(ClassMeta cls) {
         List<ClassMeta> used = new ArrayList<>();
-        cls.getFields().stream().map(FieldMeta::getFullClassName).map(MetaHolder::getClass).filter(Objects::nonNull).forEach(used::add);
+        cls.getFields().values().stream().map(FieldMeta::getFullClassName).map(MetaHolder::getClass).filter(Objects::nonNull).forEach(used::add);
         cls.getMethods().stream().map(MethodMeta::getFullQualifiedReturnType).map(MetaHolder::getClass).filter(Objects::nonNull).forEach(used::add);
         cls.getMethods().stream().flatMap(meth -> meth.getCalledMethods().stream()).map(MethodMeta::getOwnerClass).forEach(used::add);
         cls.getMethods().stream().flatMap(meth -> meth.getVariables().stream()).map(variable -> MetaHolder.getClass(variable.getFullClassName())).filter(Objects::nonNull).forEach(used::add);

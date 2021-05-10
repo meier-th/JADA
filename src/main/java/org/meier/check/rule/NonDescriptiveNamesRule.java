@@ -9,7 +9,10 @@ import org.meier.model.CodeBlockMeta;
 import org.meier.model.FieldMeta;
 import org.meier.model.MethodMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 @Rule
 public class NonDescriptiveNamesRule implements CheckRule {
@@ -20,8 +23,8 @@ public class NonDescriptiveNamesRule implements CheckRule {
     public RuleResult executeRule(Collection<ClassMeta> classes) {
         List<DefectCase> defects = new ArrayList<>();
         classes.forEach(cls -> {
-            List<MethodMeta> methods = cls.getMethods();
-            List<FieldMeta> fields = cls.getFields();
+            Set<MethodMeta> methods = cls.getMethods();
+            Collection<FieldMeta> fields = cls.getFields().values();
             List<CodeBlockMeta> initializerBlocks = cls.getCodeBlocks();
             for (MethodMeta meth : methods) {
                 String methName = meth.getShortName();
@@ -34,7 +37,7 @@ public class NonDescriptiveNamesRule implements CheckRule {
                             .setLineNumber(meth.getStartLine()));
                 }
                 for (NameTypeBean variable : meth.getVariables()) {
-                    if (!variable.isLoopVariable() && isNonDescriptive(variable.getName())) {
+                    if (variable.isNotLoopVariable() && isNonDescriptive(variable.getName())) {
                         defects.add(DefectCase.newInstance()
                                 .setDefectName("Non-descriptive variable name")
                                 .setClassName(cls.getFullName())
@@ -55,7 +58,7 @@ public class NonDescriptiveNamesRule implements CheckRule {
             }
             for (CodeBlockMeta block : initializerBlocks) {
                 for (NameTypeBean variable : block.getVariables()) {
-                    if (!variable.isLoopVariable()) {
+                    if (variable.isNotLoopVariable()) {
                         String name = variable.getName();
                         if (isNonDescriptive(name)) {
                             defects.add(DefectCase.newInstance()

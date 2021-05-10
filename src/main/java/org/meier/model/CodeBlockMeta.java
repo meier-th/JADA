@@ -30,20 +30,23 @@ public class CodeBlockMeta implements Meta, CodeContainer {
     }
 
     public void resolveCalledMethods() {
-        calledMethods = calledMethodsNames.stream()
-                .map(meth -> {
-                    ClassMeta ownerClass = MetaHolder.getClass(meth.getClassName());
-                    if (ownerClass != null) {
-                        return ownerClass.getMethods()
-                                .stream()
-                                .filter(mt -> mt.getName().equals(meth.getFullMethodName()))
-                                .findFirst().orElse(null);
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        calledMethods.forEach(meth -> meth.addCalledBy(this.ownerClass));
+        if (calledMethodsNames != null) {
+            calledMethods = calledMethodsNames.stream()
+                    .map(meth -> {
+                        ClassMeta ownerClass = MetaHolder.getClass(meth.getClassName());
+                        if (ownerClass != null) {
+                            return ownerClass.getMethods()
+                                    .stream()
+                                    .filter(mt -> mt.getName().equals(meth.getFullMethodName()))
+                                    .findFirst().orElse(null);
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            calledMethods.forEach(meth -> meth.addCalledBy(this.ownerClass));
+            calledMethodsNames = null;
+        }
     }
 
     public ClassMeta getOwnerClass() {
@@ -62,10 +65,6 @@ public class CodeBlockMeta implements Meta, CodeContainer {
     public CodeBlockMeta setCalledMethods(List<MethodMeta> calledMethods) {
         this.calledMethods = calledMethods;
         return this;
-    }
-
-    public List<CalledMethodBean> getCalledMethodsNames() {
-        return calledMethodsNames;
     }
 
     public CodeBlockMeta setCalledMethodsNames(List<CalledMethodBean> calledMethodsNames) {

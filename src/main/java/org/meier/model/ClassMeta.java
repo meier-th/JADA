@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 public class ClassMeta implements Meta {
 
     private final String fullName;
-    private List<MethodMeta> methods = new ArrayList<>();
-    private List<FieldMeta> fields = new ArrayList<>();
+    private Set<MethodMeta> methods = new HashSet<>();
+    private Map<String, FieldMeta> fields = new HashMap<>();
     private final List<ClassMeta> innerClasses = new ArrayList<>();
     private final List<Modifier> modifiers = new ArrayList<>();
     private boolean nested = false;
@@ -15,8 +15,8 @@ public class ClassMeta implements Meta {
     private final List<ClassMeta> projectImplementedInterfaces = new ArrayList<>();
     private final List<ClassMeta> projectExtendedBy = new ArrayList<>();
     private final List<ClassMeta> projectImplementedBy = new ArrayList<>();
-    private final Set<String> extendedClasses = new HashSet<>();
-    private final Set<String> implementedInterfaces = new HashSet<>();
+    private Set<String> extendedClasses = new HashSet<>();
+    private Set<String> implementedInterfaces = new HashSet<>();
     private final List<CodeBlockMeta> codeBlocks = new ArrayList<>();
     private int startLine;
     private List<ConstructorMeta> constructors = new ArrayList<>();
@@ -119,8 +119,12 @@ public class ClassMeta implements Meta {
     }
 
     public void resolveExtendedAndImplemented() {
-        this.projectExtendedClasses.addAll(this.extendedClasses.stream().map(MetaHolder::getClass).filter(Objects::nonNull).collect(Collectors.toList()));
-        this.projectImplementedInterfaces.addAll(this.implementedInterfaces.stream().map(MetaHolder::getClass).filter(Objects::nonNull).collect(Collectors.toList()));
+        if (extendedClasses != null)
+            this.projectExtendedClasses.addAll(this.extendedClasses.stream().map(MetaHolder::getClass).filter(Objects::nonNull).collect(Collectors.toList()));
+        if (implementedInterfaces != null)
+            this.projectImplementedInterfaces.addAll(this.implementedInterfaces.stream().map(MetaHolder::getClass).filter(Objects::nonNull).collect(Collectors.toList()));
+        this.extendedClasses = null;
+        this.implementedInterfaces = null;
         this.projectExtendedClasses.forEach(cls -> cls.addExtendedBy(this));
         this.projectImplementedInterfaces.forEach(cls -> cls.addImplementedBy(this));
     }
@@ -137,14 +141,6 @@ public class ClassMeta implements Meta {
         return projectImplementedInterfaces;
     }
 
-    public Set<String> getExtendedClasses() {
-        return extendedClasses;
-    }
-
-    public Set<String> getImplementedInterfaces() {
-        return implementedInterfaces;
-    }
-
     public String getFullName() {
         return fullName;
     }
@@ -154,22 +150,26 @@ public class ClassMeta implements Meta {
     }
 
     public void addField(FieldMeta field) {
-        fields.add(field);
+        fields.put(field.getName(), field);
     }
 
-    public List<MethodMeta> getMethods() {
+    public Set<MethodMeta> getMethods() {
         return methods;
     }
 
-    public void setMethods(List<MethodMeta> methods) {
+    public void setMethods(Set<MethodMeta> methods) {
         this.methods = methods;
     }
 
-    public List<FieldMeta> getFields() {
+    public FieldMeta getField(String fieldName) {
+        return this.fields.get(fieldName);
+    }
+
+    public Map<String, FieldMeta> getFields() {
         return fields;
     }
 
-    public void setFields(List<FieldMeta> fields) {
+    public void setFields(Map<String, FieldMeta> fields) {
         this.fields = fields;
     }
 

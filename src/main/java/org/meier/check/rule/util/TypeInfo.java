@@ -25,10 +25,10 @@ public class TypeInfo {
     private static ResolvedType getResolvedType(Type type) {
         try {
             return type.resolve();
-        } catch (UnsupportedOperationException error) {
+        } catch (Exception error) {
             try {
                 return type.asTypeParameter().resolve();
-            } catch (IllegalStateException err) {
+            } catch (Exception err) {
                 return null;
             }
         }

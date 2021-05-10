@@ -7,6 +7,7 @@ import org.meier.bean.CalledMethodBean;
 import org.meier.build.util.TypeResolver;
 import org.meier.model.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,13 +29,13 @@ public class MethodVisitor extends VoidVisitorAdapter<ClassMeta> {
             ).collect(Collectors.toList());
 
             List<FieldMeta> accessedFields = n.accept(new FieldsAccessVisitor(), null);
-
             List<CalledMethodBean> calledMethods = n.accept(new MethodCallVisitor(), null);
-
             Boolean isOverrideAnnotated = n.accept(new OverrideAnnotationVisitor(), null);
             boolean annotated = isOverrideAnnotated != null && isOverrideAnnotated;
 
-            MethodMeta method = new MethodMeta(n, fullName, Set.copyOf(modifiersList), parameters, accessedFields, calledMethods, returnType, classMeta, retType, annotated);
+            MethodMeta method = new MethodMeta(n, fullName, Set.copyOf(modifiersList), parameters,
+                    accessedFields == null ? Collections.emptyList() : accessedFields, calledMethods == null ? Collections.emptyList() : calledMethods,
+                    returnType, classMeta, retType, annotated);
             n.accept(new VariablesVisitor(), method);
             classMeta.addMethod(method);
         }

@@ -16,15 +16,8 @@ public class NameTypeBean {
         this.className = className;
     }
 
-    public NameTypeBean(String name, String fullClassName, String className, ResolvedType type) {
-        this.name = name;
-        this.fullClassName = fullClassName;
-        this.className = className;
-        this.type = type;
-    }
-
-    public boolean isLoopVariable() {
-        return this.isLoopVariable;
+    public boolean isNotLoopVariable() {
+        return !this.isLoopVariable;
     }
 
     public void setLoopVariable(boolean loopVariable) {

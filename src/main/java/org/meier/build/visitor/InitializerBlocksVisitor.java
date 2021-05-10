@@ -2,12 +2,10 @@ package org.meier.build.visitor;
 
 import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import org.meier.bean.CalledMethodBean;
 import org.meier.model.ClassMeta;
 import org.meier.model.CodeBlockMeta;
 import org.meier.model.Modifier;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InitializerBlocksVisitor extends VoidVisitorAdapter<ClassMeta> {

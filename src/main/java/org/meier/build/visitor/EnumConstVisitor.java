@@ -12,12 +12,11 @@ public class EnumConstVisitor extends VoidVisitorAdapter<EnumMeta> {
 
     @Override
     public void visit(EnumConstantDeclaration n, EnumMeta parent) {
-        EnumConstantMeta enumMeta = new EnumConstantMeta(parent.getFullName()+"."+n.resolve().asEnumConstant().getName(), Collections.emptyList(), true);
+        EnumConstantMeta enumMeta = new EnumConstantMeta(parent.getFullName()+"."+n.resolve().asEnumConstant().getName(), Collections.emptyList(), n, true);
         parent.addEnumConstant(enumMeta);
         MetaHolder.addClass(enumMeta);
         enumMeta.setStartLine(n.getBegin().get().line);
         n.accept(new FieldVisitor(), enumMeta);
         n.accept(new InnerClassVisitor(), enumMeta);
-        n.accept(new MethodVisitor(), enumMeta);
     }
 }

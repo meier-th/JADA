@@ -42,7 +42,19 @@ public class FactoryMethodRule implements CheckRule {
     }
 
     private boolean hasNoIfsAndSwitchesDeepSearch(MethodMeta method) {
-        return hasNoIfsAndSwitches(method) && method.getCalledMethods().stream().allMatch(this::hasNoIfsAndSwitchesDeepSearch);
+        Set<MethodMeta> processedMethods = new HashSet<>();
+        Stack<MethodMeta> methodsToProcess = new Stack<>();
+        methodsToProcess.push(method);
+        while (!methodsToProcess.isEmpty()) {
+            MethodMeta meth = methodsToProcess.pop();
+            if (processedMethods.contains(meth))
+                continue;
+            processedMethods.add(meth);
+            if (!hasNoIfsAndSwitches(meth))
+                return false;
+            meth.getCalledMethods().forEach(methodsToProcess::push);
+        }
+        return true;
     }
 
     private boolean returnsProjectClass(MethodMeta method) {

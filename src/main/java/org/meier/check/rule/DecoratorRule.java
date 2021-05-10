@@ -21,7 +21,7 @@ public class DecoratorRule implements CheckRule {
     public RuleResult executeRule(Collection<ClassMeta> classes) {
         List<DefectCase> defects = new ArrayList<>();
         classes.forEach(cls ->
-                cls.getFields().stream().filter(field -> isFieldUsedToDecorate(field, cls))
+                cls.getFields().values().stream().filter(field -> isFieldUsedToDecorate(field, cls))
                 .filter(field -> !ClassMetaInfo.getAllAncestors(cls).contains(MetaHolder.getClass(field.getFullClassName())))
                 .forEach(field ->
                         defects.add(DefectCase.newInstance()

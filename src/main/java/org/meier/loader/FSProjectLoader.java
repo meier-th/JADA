@@ -15,9 +15,7 @@ import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
 import org.meier.build.visitor.*;
-import org.meier.model.ClassMeta;
-import org.meier.model.MetaHolder;
-import org.meier.model.Modifier;
+import org.meier.model.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,9 +36,7 @@ public class FSProjectLoader implements ProjectLoader {
         Files.walk(jarDir, Integer.MAX_VALUE).filter(this::isJar).forEach(jar -> {
             try {
                 combinedSolver.add(new JarTypeSolver(jar));
-            } catch (IOException e) {
-                // log
-            }
+            } catch (IOException ignored) {}
         });
         JavaSymbolSolver symbolSolver = new JavaSymbolSolver(combinedSolver);
         return StaticJavaParser.getConfiguration()
@@ -50,18 +46,15 @@ public class FSProjectLoader implements ProjectLoader {
     @Override
     public void loadProject(String dirPath, String jarsDir) throws IOException {
         Path path = Paths.get(dirPath);
-
         ProjectRoot projectRoot =
                 new SymbolSolverCollectionStrategy(init(path, Paths.get(jarsDir)))
                         .collect(path);
 
         List<SourceRoot> roots = projectRoot.getSourceRoots();
-
         List<CompilationUnit> cus = roots.stream().flatMap(root -> {
             try {
                 return root.tryToParse().stream();
             } catch (IOException e) {
-                // some logs
                 return Stream.empty();
             }
         }).map(pr -> pr.getResult().orElse(null))
@@ -82,9 +75,7 @@ public class FSProjectLoader implements ProjectLoader {
                     try {
                         cls.setExtendedClasses(clIntDecl.getExtendedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
                         cls.setImplementedInterfaces(clIntDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
-                    } catch (Exception error) {
-                        System.out.println(error);
-                    }
+                    } catch (Exception ignored) {}
                 } else if (enumDecl != null) {
                     cls.setImplementedInterfaces(enumDecl.getImplementedTypes().stream().map(type -> type.resolve().getQualifiedName()).collect(Collectors.toList()));
                 }
@@ -96,7 +87,7 @@ public class FSProjectLoader implements ProjectLoader {
                 classMetaForCUs.put(cu, cls);
             }
         });
-        classMetaForCUs.forEach((cu, cls) -> cu.accept(new MethodVisitor(), cls));
+        classMetaForCUs.forEach((cu, cls) -> { try {cu.accept(new MethodVisitor(), cls);} catch(Exception ignored){}});
         InnerClassVisitor.runInnerClassesMethodVisitors();
         MetaHolder.forEach(ClassMeta::resolveExtendedAndImplemented);
         MetaHolder.forEach(ClassMeta::resolveMethodCalls);
@@ -105,5 +96,4 @@ public class FSProjectLoader implements ProjectLoader {
     private boolean isJar(Path file) {
         return file.toString().endsWith(".jar");
     }
-
 }
